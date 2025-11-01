@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MolView</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.css" />
+    <script src="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #app-container {
+            display: flex;
+            height: {{height}}px;
+        }
+        #molview-container {
+            width: {{width}}px;
+            height: {{height}}px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 20px 35px;
+            border-radius: 8px;
+            display: none;
+            z-index: 200;
+            font-size: 16px;
+        }
+
+        /* Control Panel Styles */
+        #control-panel {
+            width: 280px;
+            height: {{height}}px;
+            background: hsl(0 0% 100%);
+            border-left: 1px solid hsl(214.3 31.8% 91.4%);
+            overflow-y: auto;
+            flex-shrink: 0;
+            display: none;
+        }
+        #control-panel.visible {
+            display: block;
+        }
+        .panel-section {
+            padding: 15px;
+            border-bottom: 1px solid hsl(214.3 31.8% 91.4%);
+        }
+        .panel-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: hsl(220, 9%, 46%);
+        }
+
+        /* Color Mode Dropdown */
+        .color-mode-dropdown {
+            position: relative;
+        }
+        .color-mode-toggle {
+            background: hsl(0 0% 100%);
+            border: 1px solid hsl(214.3 31.8% 91.4%);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: hsl(220, 9%, 46%);
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .color-mode-toggle:hover {
+            background: hsl(210 40% 98%);
+            border-color: hsl(220, 9%, 46%);
+        }
+        .dropdown-arrow {
+            font-size: 10px;
+            transition: transform 0.2s ease;
+        }
+        .color-mode-dropdown.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        .color-mode-options {
+            position: absolute;
+            background: hsl(0 0% 100%);
+            border: 1px solid hsl(214.3 31.8% 91.4%);
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            width: 100%;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 1000;
+            top: 100%;
+            margin-top: 4px;
+        }
+        .color-mode-dropdown.open .color-mode-options {
+            max-height: 400px;
+            overflow-y: auto;
+            opacity: 1;
+            visibility: visible;
+        }
+        .color-mode-option {
+            padding: 10px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            color: hsl(220, 9%, 46%);
+            transition: background 0.2s ease;
+        }
+        .color-mode-option:hover {
+            background: hsl(210 40% 98%);
+        }
+        .color-mode-option.active {
+            background: hsl(220, 9%, 46%);
+            color: hsl(210 40% 98%);
+            font-weight: 500;
+        }
+        .color-mode-option[data-mode="rainbow"] {
+            padding: 0;
+        }
+        .rainbow-main-label {
+            padding: 10px 12px;
+            cursor: pointer;
+        }
+        .rainbow-palette-options {
+            padding: 4px 0;
+            display: none;
+            border-top: 1px solid hsl(214.3 31.8% 91.4%);
+            background: hsl(0 0% 100%);
+        }
+        .color-mode-option[data-mode="rainbow"]:hover .rainbow-palette-options,
+        .color-mode-option[data-mode="rainbow"].expanded .rainbow-palette-options {
+            display: block;
+        }
+        .palette-option {
+            padding: 8px 16px;
+            font-size: 11px;
+            cursor: pointer;
+            color: hsl(220, 9%, 46%);
+            transition: background 0.2s ease;
+        }
+        .palette-option:hover {
+            background: hsl(214.3 31.8% 91.4%);
+        }
+        .palette-option.active {
+            background: hsl(220, 9%, 46%);
+            color: hsl(210 40% 98%);
+        }
+
+        /* Custom Color Palette */
+        .custom-colors {
+            margin-top: 10px;
+            display: none;
+        }
+        .custom-colors.visible {
+            display: block;
+        }
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .color-option:hover {
+            border-color: #666;
+            transform: scale(1.1);
+        }
+        .color-option.active {
+            border-color: hsl(222.2 84% 4.9%);
+            border-width: 3px;
+        }
+
+        /* Secondary Structure Color Customization */
+        .secondary-colors-section {
+            margin-top: 10px;
+            padding: 10px;
+            background: hsl(210 40% 98%);
+            border-radius: 6px;
+            display: none;
+        }
+        .secondary-colors-section.active {
+            display: block;
+        }
+        .secondary-color-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 12px;
+            color: hsl(220, 9%, 46%);
+        }
+        .secondary-label {
+            font-weight: 500;
+        }
+        .secondary-color-picker {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 2px solid hsl(214.3 31.8% 91.4%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .secondary-color-picker:hover {
+            border-color: hsl(220, 9%, 46%);
+            transform: scale(1.1);
+        }
+
+        /* Chain Color Customization */
+        .chain-colors-section {
+            margin-top: 10px;
+            padding: 10px;
+            background: hsl(210 40% 98%);
+            border-radius: 6px;
+            display: none;
+        }
+        .chain-colors-section.active {
+            display: block;
+        }
+        .chain-color-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 12px;
+            color: hsl(220, 9%, 46%);
+        }
+        .chain-label {
+            font-weight: 500;
+        }
+        .chain-color-picker {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 2px solid hsl(214.3 31.8% 91.4%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chain-color-picker:hover {
+            border-color: hsl(220, 9%, 46%);
+            transform: scale(1.1);
+        }
+
+        /* Style Toggles */
+        .style-toggles {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid hsl(214.3 31.8% 91.4%);
+        }
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        .toggle-label {
+            font-size: 12px;
+            color: hsl(220, 9%, 46%);
+            font-weight: 500;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: hsl(214.3 31.8% 91.4%);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: hsl(220, 9%, 46%);
+        }
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Surface Options */
+        .surface-options {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: hsl(210 40% 98%);
+            border-radius: 6px;
+        }
+        .surface-options.active {
+            display: block;
+        }
+        .surface-option-item {
+            margin-bottom: 10px;
+        }
+        .surface-option-item:last-child {
+            margin-bottom: 0;
+        }
+        .surface-option-label {
+            display: block;
+            font-size: 11px;
+            color: hsl(220, 9%, 46%);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .surface-opacity-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .surface-opacity-slider {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: hsl(214.3 31.8% 91.4%);
+            outline: none;
+        }
+        .surface-opacity-input {
+            width: 45px;
+            padding: 4px 6px;
+            border: 1px solid hsl(214.3 31.8% 91.4%);
+            border-radius: 4px;
+            font-size: 11px;
+            text-align: center;
+        }
+        .surface-color-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .surface-inherit-label {
+            font-size: 11px;
+            color: hsl(220, 9%, 46%);
+        }
+        .surface-color-picker {
+            width: 40px;
+            height: 30px;
+            border-radius: 4px;
+            border: 2px solid hsl(214.3 31.8% 91.4%);
+            cursor: pointer;
+        }
+        .surface-color-picker-wrapper {
+            display: none;
+        }
+        .surface-color-picker-wrapper.active {
+            display: block;
+        }
+        /* Grid Mode Styles */
+        #grid-container {
+            width: 100%;
+            height: {{height}}px;
+            display: grid;
+            grid-template-rows: repeat({{rows}}, 1fr);
+            grid-template-columns: repeat({{cols}}, 1fr);
+            gap: 4px;
+            padding: 4px;
+            box-sizing: border-box;
+        }
+        .grid-cell {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            min-height: 200px;
+        }
+        .grid-cell-label {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .grid-cell-viewer {
+            width: 100%;
+            height: 100%;
+        }
+        .grid-cell-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading indicator (shared by both modes) -->
+    <div id="loading">Loading...</div>
+
+    <!-- Grid Container (for grid mode) -->
+    <div id="grid-container" style="display: none;"></div>
+
+    <!-- Single Viewer Container (for single mode) -->
+    <div id="app-container">
+        <div id="molview-container"></div>
+
+        <!-- Control Panel -->
+        <div id="control-panel">
+            <div class="panel-section">
+                <h3>Colors</h3>
+
+                <!-- Color Mode Dropdown -->
+                <div class="color-mode-dropdown" id="color-mode-dropdown">
+                    <button class="color-mode-toggle" id="color-mode-button">
+                        <span id="color-mode-label">Custom</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="color-mode-options" id="color-mode-options">
+                        <div class="color-mode-option" data-mode="uniform">Custom</div>
+                        <div class="color-mode-option" data-mode="element-symbol">Element</div>
+                        <div class="color-mode-option" data-mode="residue-name">Residue</div>
+                        <div class="color-mode-option" data-mode="secondary-structure">Secondary</div>
+                        <div class="color-mode-option" data-mode="chain-id">Chain</div>
+                        <div class="color-mode-option" data-mode="rainbow">
+                            <div class="rainbow-main-label">Rainbow</div>
+                            <div class="rainbow-palette-options">
+                                <div class="palette-option" data-palette="rainbow">Classic</div>
+                                <div class="palette-option" data-palette="viridis">Viridis</div>
+                                <div class="palette-option" data-palette="plasma">Plasma</div>
+                                <div class="palette-option" data-palette="magma">Magma</div>
+                                <div class="palette-option" data-palette="blue-red">Blue-Red</div>
+                                <div class="palette-option" data-palette="pastel">Pastel</div>
+                            </div>
+                        </div>
+                        <div class="color-mode-option" id="plddt-option" data-mode="plddt-confidence" style="display: none;">pLDDT</div>
+                    </div>
+                </div>
+
+                <!-- Custom Color Palette -->
+                <div id="custom-colors" class="custom-colors visible">
+                    <div class="color-palette">
+                        <div class="color-option active" data-color="#4ECDC4" style="background-color: #4ECDC4;" title="Teal"></div>
+                        <div class="color-option" data-color="#FF6B6B" style="background-color: #FF6B6B;" title="Red"></div>
+                        <div class="color-option" data-color="#4DABF7" style="background-color: #4DABF7;" title="Blue"></div>
+                        <div class="color-option" data-color="#69DB7C" style="background-color: #69DB7C;" title="Green"></div>
+                        <div class="color-option" data-color="#FFD93D" style="background-color: #FFD93D;" title="Yellow"></div>
+                        <div class="color-option" data-color="#FF922B" style="background-color: #FF922B;" title="Orange"></div>
+                        <div class="color-option" data-color="#DA77F2" style="background-color: #DA77F2;" title="Purple"></div>
+                        <div class="color-option" data-color="#FF8CC8" style="background-color: #FF8CC8;" title="Pink"></div>
+                        <div class="color-option" data-color="#15AABF" style="background-color: #15AABF;" title="Cyan"></div>
+                        <div class="color-option" data-color="#868E96" style="background-color: #868E96;" title="Gray"></div>
+                    </div>
+                </div>
+
+                <!-- Secondary Structure Color Customization -->
+                <div id="secondary-colors" class="secondary-colors-section">
+                    <h4 style="margin: 0 0 10px 0; font-size: 13px; color: hsl(220, 9%, 46%);">Customize Secondary Colors</h4>
+                    <div class="secondary-color-item">
+                        <span class="secondary-label">Helix</span>
+                        <input type="color" class="secondary-color-picker" id="helix-color" value="#0FA3FF" title="Helix Color">
+                    </div>
+                    <div class="secondary-color-item">
+                        <span class="secondary-label">Sheet</span>
+                        <input type="color" class="secondary-color-picker" id="sheet-color" value="#24B235" title="Sheet Color">
+                    </div>
+                    <div class="secondary-color-item">
+                        <span class="secondary-label">Coil</span>
+                        <input type="color" class="secondary-color-picker" id="coil-color" value="#E8E8E8" title="Coil Color">
+                    </div>
+                </div>
+
+                <!-- Chain Color Customization -->
+                <div id="chain-colors" class="chain-colors-section">
+                    <h4 style="margin: 0 0 10px 0; font-size: 13px; color: hsl(220, 9%, 46%);">Customize Chain Colors</h4>
+                    <div id="chain-colors-list">
+                        <!-- Chain colors will be populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Style Toggles -->
+                <div class="style-toggles">
+                    <div class="toggle-item">
+                        <span class="toggle-label">Illustrative</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="illustrative-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Surface</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="surface-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item" id="solvent-toggle-item" style="display: none;">
+                        <span class="toggle-label">Remove Solvent</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="solvent-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Surface Options -->
+                <div id="surface-options" class="surface-options">
+                    <div class="surface-option-item">
+                        <label class="surface-option-label">Opacity</label>
+                        <div class="surface-opacity-controls">
+                            <input type="range" id="surface-opacity-slider" class="surface-opacity-slider" min="0" max="100" value="40">
+                            <input type="number" id="surface-opacity-input" class="surface-opacity-input" min="0" max="100" value="40">
+                        </div>
+                    </div>
+                    <div class="surface-option-item">
+                        <label class="surface-option-label">Color</label>
+                        <div class="surface-color-controls">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="surface-inherit-toggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="surface-inherit-label">Inherit</span>
+                            <div id="surface-color-picker-wrapper" class="surface-color-picker-wrapper">
+                                <input type="color" id="surface-color-picker" class="surface-color-picker" value="#4ECDC4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let viewer = null;
+        let currentColorMode = '{{color_mode}}';
+        let currentColorParams = {{color_params}};
+        let surfaceEnabled = {{surface_enabled}};
+        let surfaceOpacity = {{surface_opacity}};
+        let illustrativeEnabled = {{illustrative_enabled}};
+        let spinEnabled = {{spin_enabled}};
+        let removeSolventEnabled = {{remove_solvent}};
+        const isGridMode = {{is_grid_mode}};
+        const gridViewers = [];
+
+        // Chain color customization
+        let chainColors = {}; // Store custom colors for each chain ID
+        let detectedChains = []; // List of detected chain IDs in current structure
+        let chainColorUpdateTimeout = null; // Debounce timer for chain color updates
+
+        // Detection flags
+        let hasSolvent = false; // Whether the structure contains solvent molecules
+        let hasPLDDT = false; // Whether the structure has pLDDT data
+
+        // Default chain colors (to cycle through when chains are detected)
+        const DEFAULT_CHAIN_COLORS = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+            '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B4B4', '#52B788'
+        ];
+
+        // Helper functions for color manipulation
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+
+        function interpolateColor(color1, color2, factor) {
+            const c1 = hexToRgb(color1);
+            const c2 = hexToRgb(color2);
+            if (!c1 || !c2) return color1;
+
+            const r = Math.round(c1.r + factor * (c2.r - c1.r));
+            const g = Math.round(c1.g + factor * (c2.g - c1.g));
+            const b = Math.round(c1.b + factor * (c2.b - c1.b));
+            return rgbToHex(r, g, b);
+        }
+
+        function generateGradient(colors, steps) {
+            if (steps <= 0) return [];
+            if (steps === 1) return [colors[0]];
+            if (colors.length === 0) return [];
+            if (colors.length === 1) return Array(steps).fill(colors[0]);
+
+            const gradient = [];
+            const segmentCount = colors.length - 1;
+
+            for (let i = 0; i < steps; i++) {
+                const position = i / (steps - 1) * segmentCount;
+                const segmentIndex = Math.floor(position);
+                const segmentPosition = position - segmentIndex;
+
+                if (segmentIndex >= segmentCount) {
+                    gradient.push(colors[colors.length - 1]);
+                } else {
+                    const color = interpolateColor(
+                        colors[segmentIndex],
+                        colors[segmentIndex + 1],
+                        segmentPosition
+                    );
+                    gradient.push(color);
+                }
+            }
+
+            return gradient;
+        }
+
+        function hexToMolstarColor(hex) {
+            return parseInt(hex.replace('#', ''), 16);
+        }
+
+        // Initialize Molstar viewer
+        async function initViewer() {
+            try {
+                viewer = await molstar.Viewer.create('molview-container', {
+                    layoutIsExpanded: false,
+                    layoutShowControls: false,
+                    layoutShowLeftPanel: false,
+                    layoutShowSequence: {{show_sequence}},
+                    layoutShowLog: false,
+                    viewportShowExpand: false,
+                    viewportShowSelectionMode: false,
+                    viewportShowAnimation: {{show_animation}}
+                });
+
+                // Set background color
+                if ('{{background_color}}') {
+                    const bgColor = parseInt('{{background_color}}'.replace('#', ''), 16);
+                    viewer.plugin.canvas3d.setProps({
+                        renderer: {
+                            backgroundColor: bgColor
+                        }
+                    });
+                }
+
+                console.log('MolView initialized successfully');
+                return viewer;
+            } catch (error) {
+                console.error('Failed to initialize MolView:', error);
+                throw error;
+            }
+        }
+
+        // Load structure
+        async function loadStructure(data, format) {
+            if (!viewer) {
+                await initViewer();
+            }
+
+            const loadingEl = document.getElementById('loading');
+            loadingEl.style.display = 'block';
+
+            try {
+                await viewer.plugin.clear();
+
+                const mimeType = format === 'mmcif' ? 'chemical/x-mmcif' : 'chemical/x-pdb';
+                const blob = new Blob([data], { type: mimeType });
+                const blobUrl = URL.createObjectURL(blob);
+
+                const dataObj = await viewer.plugin.builders.data.download({
+                    url: blobUrl,
+                    isBinary: false
+                });
+
+                const trajectory = await viewer.plugin.builders.structure.parseTrajectory(
+                    dataObj,
+                    format
+                );
+
+                // Apply default preset
+                const structureRef = await viewer.plugin.builders.structure.hierarchy.applyPreset(
+                    trajectory,
+                    'default'
+                );
+
+                URL.revokeObjectURL(blobUrl);
+
+                // Detect features in the structure
+                await detectChainsInStructure();
+                await detectSolvent();
+                await detectPLDDT();
+
+                // Apply solvent removal if enabled
+                if (removeSolventEnabled && hasSolvent) {
+                    await applySolventRemoval();
+                }
+
+                // Apply color theme
+                await applyColorTheme();
+
+                // Apply surface if enabled
+                if (surfaceEnabled) {
+                    await applySurface();
+                }
+
+                // Apply illustrative style if enabled
+                if (illustrativeEnabled) {
+                    await applyIllustrativeStyle();
+                }
+
+                // Enable spinning if requested
+                if (spinEnabled) {
+                    viewer.plugin.managers.camera.spin(true);
+                }
+
+                console.log('Structure loaded successfully');
+            } catch (error) {
+                console.error('Error loading structure:', error);
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        // Apply color theme
+        async function applyColorTheme() {
+            if (!viewer) return;
+
+            try {
+                console.log('Applying color theme:', currentColorMode, currentColorParams);
+
+                // Handle rainbow coloring specially
+                if (currentColorMode === 'rainbow-sequence') {
+                    await applyRainbowColoring();
+                    return;
+                }
+
+                // Handle custom chain colors specially
+                if (currentColorMode === 'custom-chain-colors' || currentColorMode === 'chain-id') {
+                    await applyCustomChainColors();
+                    return;
+                }
+
+                // Handle secondary structure with custom colors
+                if (currentColorMode === 'secondary-structure') {
+                    const helixColor = document.getElementById('helix-color')?.value || '#0FA3FF';
+                    const sheetColor = document.getElementById('sheet-color')?.value || '#24B235';
+                    const coilColor = document.getElementById('coil-color')?.value || '#E8E8E8';
+
+                    currentColorParams = {
+                        colors: {
+                            name: 'custom',
+                            params: {
+                                alphaHelix: hexToMolstarColor(helixColor),
+                                threeTenHelix: hexToMolstarColor(helixColor),
+                                piHelix: hexToMolstarColor(helixColor),
+                                betaStrand: hexToMolstarColor(sheetColor),
+                                betaTurn: hexToMolstarColor(sheetColor),
+                                coil: hexToMolstarColor(coilColor),
+                                bend: hexToMolstarColor(coilColor)
+                            }
+                        }
+                    };
+                }
+
+                // Handle other color themes - update all representations individually
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                for (const structure of structures) {
+                    for (const component of structure.components) {
+                        if (component.representations) {
+                            for (const repr of component.representations) {
+                                // Check if this is a surface representation
+                                const params = repr.cell.transform.params;
+                                const reprType = params?.type?.name || params?.type;
+                                const isSurface = reprType === 'gaussian-surface' || reprType === 'molecular-surface';
+
+                                // Skip surface representations if inherit is off
+                                const inheritToggle = document.getElementById('surface-inherit-toggle');
+                                const inheritColor = inheritToggle ? inheritToggle.checked : true;
+                                if (isSurface && !inheritColor) {
+                                    console.log('Skipping surface color update (inherit is off)');
+                                    continue;
+                                }
+
+                                // Update the representation
+                                const update = plugin.build().to(repr.cell).update({
+                                    ...repr.cell.transform.params,
+                                    colorTheme: { name: currentColorMode, params: currentColorParams }
+                                });
+                                await update.commit();
+                            }
+                        }
+                    }
+                }
+
+                console.log('Color theme applied successfully');
+            } catch (error) {
+                console.error('Error applying color theme:', error);
+            }
+        }
+
+        // Apply custom chain colors
+        async function applyCustomChainColors() {
+            if (!viewer || !viewer.plugin) {
+                console.warn('Viewer is null, skipping chain coloring');
+                return;
+            }
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                if (!structures || structures.length === 0) {
+                    console.warn('No structures found for chain coloring');
+                    return;
+                }
+
+                // Merge colors from Python params into global chainColors if provided
+                if (currentColorParams.colors && Object.keys(currentColorParams.colors).length > 0) {
+                    Object.assign(chainColors, currentColorParams.colors);
+                }
+                console.log('Applying custom chain colors:', chainColors);
+
+                // Create unique theme name for this instance
+                const themeName = `custom-chain-colors-${Math.random().toString(36).substring(7)}`;
+
+                // Define the custom chain color theme provider
+                const CustomChainColorThemeProvider = {
+                    name: themeName,
+                    label: "Custom Chain Colors",
+                    category: "Custom",
+                    factory: (ctx, props) => {
+                        return {
+                            factory: CustomChainColorThemeProvider.factory,
+                            granularity: "group",
+                            color: (location) => {
+                                try {
+                                    const unit = location.unit;
+                                    const chainId = unit.chainGroupId || unit.label_asym_id || 'A';
+                                    const hexColor = chainColors[chainId] || '#4ECDC4';
+                                    return hexToMolstarColor(hexColor);
+                                } catch (error) {
+                                    return 0x4ECDC4; // Default teal
+                                }
+                            },
+                            props: props,
+                            description: 'Custom colors for each chain'
+                        };
+                    },
+                    getParams: () => ({}),
+                    defaultValues: {},
+                    isApplicable: (ctx) => !!ctx.structure
+                };
+
+                // Register the color theme
+                plugin.representation.structure.themes.colorThemeRegistry.add(CustomChainColorThemeProvider);
+                console.log(`Registered chain color theme: ${themeName}`);
+
+                // Apply the theme to all structures
+                for (const structure of structures) {
+                    if (structure.components && structure.components.length > 0) {
+                        await plugin.managers.structure.component.updateRepresentationsTheme(
+                            structure.components,
+                            { color: themeName }
+                        );
+                    }
+                }
+
+                console.log('Successfully applied custom chain colors');
+
+            } catch (error) {
+                console.error('Error applying custom chain colors:', error);
+            }
+        }
+
+        // Apply solvent removal by using structure overpaint
+        async function applySolventRemoval() {
+            if (!viewer || !viewer.plugin) return;
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                for (const structure of structures) {
+                    if (structure.components) {
+                        for (const component of structure.components) {
+                            const componentLabel = component.cell.obj?.label || '';
+
+                            // Only process water component
+                            if (componentLabel.toLowerCase() === 'water') {
+                                // Hide water by deleting all its representations
+                                if (component.representations && component.representations.length > 0) {
+                                    const builder = plugin.build();
+                                    for (const repr of component.representations) {
+                                        builder.delete(repr.cell);
+                                    }
+                                    await builder.commit();
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                // Silently handle error
+            }
+        }
+
+
+        // Detect water molecules in the structure
+        async function detectSolvent() {
+            if (!viewer || !viewer.plugin) return;
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                hasSolvent = false;
+
+                // Check for water component in the structure hierarchy
+                for (const structure of structures) {
+                    if (structure.components) {
+                        for (const component of structure.components) {
+                            const label = component.cell.obj?.label || '';
+                            // Check if this is a water component (exact match, case-insensitive)
+                            if (label.toLowerCase() === 'water') {
+                                hasSolvent = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (hasSolvent) break;
+                }
+
+                // Show or hide solvent toggle based on detection
+                const solventToggleItem = document.getElementById('solvent-toggle-item');
+                if (solventToggleItem) {
+                    solventToggleItem.style.display = hasSolvent ? 'flex' : 'none';
+                }
+            } catch (error) {
+                hasSolvent = false;
+            }
+        }
+
+        // Detect pLDDT data in the structure
+        async function detectPLDDT() {
+            if (!viewer || !viewer.plugin) return;
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                if (!structures || structures.length === 0) {
+                    hasPLDDT = false;
+                    return;
+                }
+
+                for (const structure of structures) {
+                    const structureData = structure.cell.obj?.data;
+                    if (structureData && structureData.models && structureData.models.length > 0) {
+                        const model = structureData.models[0];
+
+                        // Check for pLDDT in atom properties (b_iso_or_equiv typically stores pLDDT)
+                        if (model.atomicHierarchy && model.atomicHierarchy.atoms) {
+                            const atoms = model.atomicHierarchy.atoms;
+                            // Check if we have b-factor like data that could be pLDDT
+                            if (atoms.B_iso_or_equiv) {
+                                hasPLDDT = true;
+                                console.log('Detected pLDDT data in structure');
+
+                                // Show pLDDT option in color dropdown
+                                const plddtOption = document.getElementById('plddt-option');
+                                if (plddtOption) {
+                                    plddtOption.style.display = 'block';
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                hasPLDDT = false;
+            } catch (error) {
+                console.error('Error detecting pLDDT:', error);
+                hasPLDDT = false;
+            }
+        }
+
+        // Detect chains in the loaded structure
+        async function detectChainsInStructure() {
+            if (!viewer || !viewer.plugin) return;
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                if (!structures || structures.length === 0) return;
+
+                // Extract chain IDs
+                const chainsSet = new Set();
+                for (const structure of structures) {
+                    const structureData = structure.cell.obj?.data;
+                    if (structureData && structureData.models && structureData.models.length > 0) {
+                        const model = structureData.models[0];
+
+                        // Iterate through units to find chains
+                        for (const unit of structureData.units) {
+                            const chainId = unit.chainGroupId || unit.label_asym_id || 'A';
+                            if (chainId) chainsSet.add(chainId);
+                        }
+                    }
+                }
+
+                detectedChains = Array.from(chainsSet).sort();
+
+                // Initialize chain colors if not already set
+                detectedChains.forEach((chainId, index) => {
+                    if (!chainColors[chainId]) {
+                        chainColors[chainId] = DEFAULT_CHAIN_COLORS[index % DEFAULT_CHAIN_COLORS.length];
+                    }
+                });
+
+                // Update UI
+                updateChainColorsUI();
+
+                console.log('Detected chains:', detectedChains);
+            } catch (error) {
+                console.error('Error detecting chains:', error);
+            }
+        }
+
+        // Update chain colors UI
+        function updateChainColorsUI() {
+            const chainColorsList = document.getElementById('chain-colors-list');
+            const chainColorsSection = document.getElementById('chain-colors');
+
+            if (detectedChains.length === 0) {
+                chainColorsSection.classList.remove('active');
+                return;
+            }
+
+            // Show section when in chain mode
+            if (currentColorMode === 'chain-id' || currentColorMode === 'custom-chain-colors') {
+                chainColorsSection.classList.add('active');
+            }
+
+            chainColorsList.innerHTML = detectedChains.map(chainId => `
+                <div class="chain-color-item">
+                    <span class="chain-label">Chain ${chainId}</span>
+                    <input type="color"
+                           class="chain-color-picker"
+                           value="${chainColors[chainId] || '#4ECDC4'}"
+                           data-chain="${chainId}"
+                           title="Pick color for chain ${chainId}">
+                </div>
+            `).join('');
+
+            // Add event listeners to color pickers with debouncing
+            chainColorsList.querySelectorAll('.chain-color-picker').forEach(picker => {
+                picker.addEventListener('input', (e) => {
+                    const chainId = e.target.dataset.chain;
+                    chainColors[chainId] = e.target.value;
+
+                    if (currentColorMode === 'chain-id' || currentColorMode === 'custom-chain-colors') {
+                        // Debounce the visualization refresh to avoid too many rapid updates
+                        if (chainColorUpdateTimeout) {
+                            clearTimeout(chainColorUpdateTimeout);
+                        }
+                        chainColorUpdateTimeout = setTimeout(async () => {
+                            await applyColorTheme();
+                            chainColorUpdateTimeout = null;
+                        }, 100); // 100ms debounce
+                    }
+                });
+            });
+        }
+
+        // Rainbow coloring implementation
+        async function applyRainbowColoring() {
+            if (!viewer || !viewer.plugin) {
+                console.warn('Viewer is null, skipping rainbow coloring');
+                return;
+            }
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                if (!structures || structures.length === 0) {
+                    console.warn('No structures found for rainbow coloring');
+                    return;
+                }
+
+                const paletteColors = currentColorParams.colors || ['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF8000', '#FF0000'];
+                const paletteName = currentColorParams.palette || 'rainbow';
+
+                console.log(`Applying rainbow coloring with palette: ${paletteName}`);
+
+                // Create unique theme name for this instance
+                const themeName = `rainbow-sequence-${paletteName}-${Math.random().toString(36).substring(7)}`;
+
+                // Define the rainbow color theme provider
+                const RainbowSequenceColorThemeProvider = {
+                    name: themeName,
+                    label: `Rainbow (${paletteName})`,
+                    category: "Custom",
+                    factory: (ctx, props) => {
+                        // Get the structure from context
+                        const structure = ctx.structure;
+                        if (!structure || !structure.models || structure.models.length === 0) {
+                            console.warn('No structure models found');
+                            return {
+                                factory: RainbowSequenceColorThemeProvider.factory,
+                                granularity: 'group',
+                                color: () => 0x808080,
+                                props: props
+                            };
+                        }
+
+                        // Find min and max sequence IDs across all residues
+                        let minSeqId = Infinity;
+                        let maxSeqId = -Infinity;
+
+                        for (const unit of structure.units) {
+                            if (unit.model && unit.model.atomicHierarchy) {
+                                const residues = unit.model.atomicHierarchy.residues;
+                                const seqIds = residues.label_seq_id;
+
+                                for (let i = 0; i < seqIds.rowCount; i++) {
+                                    const seqId = seqIds.value(i);
+                                    if (seqId !== null && seqId !== undefined) {
+                                        minSeqId = Math.min(minSeqId, seqId);
+                                        maxSeqId = Math.max(maxSeqId, seqId);
+                                    }
+                                }
+                            }
+                        }
+
+                        const totalResidues = maxSeqId - minSeqId + 1;
+                        console.log(`Sequence range: ${minSeqId} to ${maxSeqId} (${totalResidues} residues)`);
+
+                        // Generate gradient for the number of residues
+                        const gradient = generateGradient(paletteColors, totalResidues);
+
+                        return {
+                            factory: RainbowSequenceColorThemeProvider.factory,
+                            granularity: 'group',
+                            color: (location) => {
+                                // Get sequence ID from location
+                                try {
+                                    const unit = location.unit;
+                                    const element = location.element;
+
+                                    const residueIndex = unit.model.atomicHierarchy.residueAtomSegments.index[element];
+                                    const seqId = unit.model.atomicHierarchy.residues.label_seq_id.value(residueIndex);
+
+                                    // Map sequence ID to color index
+                                    const colorIndex = Math.max(0, Math.min(totalResidues - 1, seqId - minSeqId));
+                                    const hexColor = gradient[colorIndex];
+
+                                    return hexToMolstarColor(hexColor);
+                                } catch (error) {
+                                    // Fallback to gray if error
+                                    return 0x808080;
+                                }
+                            },
+                            props: props,
+                            description: `Rainbow coloring by sequence position (${paletteName})`
+                        };
+                    },
+                    getParams: () => ({}),
+                    defaultValues: {},
+                    isApplicable: (ctx) => !!ctx.structure
+                };
+
+                // Register the color theme
+                plugin.representation.structure.themes.colorThemeRegistry.add(RainbowSequenceColorThemeProvider);
+                console.log(`Registered rainbow theme: ${themeName}`);
+
+                // Apply the theme to all structures
+                for (const structure of structures) {
+                    if (structure.components && structure.components.length > 0) {
+                        await plugin.managers.structure.component.updateRepresentationsTheme(
+                            structure.components,
+                            { color: themeName }
+                        );
+                    }
+                }
+
+                console.log('Successfully applied rainbow coloring');
+
+            } catch (error) {
+                console.error('Error applying rainbow coloring:', error);
+            }
+        }
+
+        // Apply surface representation
+        async function applySurface() {
+            if (!viewer) return;
+
+            try {
+                const structures = viewer.plugin.managers.structure.hierarchy.current.structures;
+                const opacityValue = surfaceOpacity / 100;
+                const plugin = viewer.plugin;
+
+                // Check inherit toggle
+                const inheritToggle = document.getElementById('surface-inherit-toggle');
+                const colorPicker = document.getElementById('surface-color-picker');
+                const inheritColor = inheritToggle ? inheritToggle.checked : true;
+
+                // Remove existing surfaces first
+                await removeSurface();
+
+                // Determine color theme for surface
+                let colorThemeName = currentColorMode;
+                let colorThemeParams = currentColorParams;
+
+                // If not inheriting, use custom surface color
+                if (!inheritColor && colorPicker) {
+                    const customColor = colorPicker.value;
+                    const themeName = `custom-surface-color-${Math.random().toString(36).substring(7)}`;
+
+                    const CustomSurfaceColorThemeProvider = {
+                        name: themeName,
+                        label: "Custom Surface Color",
+                        category: "Custom",
+                        factory: (ctx, props) => {
+                            return {
+                                granularity: "uniform",
+                                color: () => hexToMolstarColor(customColor),
+                                props: props
+                            };
+                        },
+                        getParams: () => ({}),
+                        defaultValues: {},
+                        isApplicable: (ctx) => !!ctx.structure
+                    };
+
+                    plugin.representation.structure.themes.colorThemeRegistry.add(CustomSurfaceColorThemeProvider);
+                    colorThemeName = themeName;
+                    colorThemeParams = {};
+                }
+                // Handle chain mode with custom colors for surface
+                else if ((currentColorMode === 'chain-id' || currentColorMode === 'custom-chain-colors') && Object.keys(chainColors).length > 0) {
+                    // Merge colors from Python params into global chainColors if provided
+                    if (currentColorParams.colors && Object.keys(currentColorParams.colors).length > 0) {
+                        Object.assign(chainColors, currentColorParams.colors);
+                    }
+
+                    const themeName = `custom-chain-colors-surface-${Math.random().toString(36).substring(7)}`;
+
+                    const CustomChainColorSurfaceThemeProvider = {
+                        name: themeName,
+                        label: "Custom Chain Colors (Surface)",
+                        category: "Custom",
+                        factory: (ctx, props) => {
+                            return {
+                                granularity: "group",
+                                color: (location) => {
+                                    try {
+                                        const unit = location.unit;
+                                        const chainId = unit.chainGroupId || unit.label_asym_id || 'A';
+                                        const hexColor = chainColors[chainId] || '#4ECDC4';
+                                        return hexToMolstarColor(hexColor);
+                                    } catch (error) {
+                                        return 0x4ECDC4;
+                                    }
+                                },
+                                props: props
+                            };
+                        },
+                        getParams: () => ({}),
+                        defaultValues: {},
+                        isApplicable: (ctx) => !!ctx.structure
+                    };
+
+                    plugin.representation.structure.themes.colorThemeRegistry.add(CustomChainColorSurfaceThemeProvider);
+                    colorThemeName = themeName;
+                    colorThemeParams = {};
+                }
+                // Handle rainbow mode for surface
+                else if (currentColorMode === 'rainbow-sequence') {
+                    const paletteColors = currentColorParams.colors || ['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF8000', '#FF0000'];
+                    const paletteName = currentColorParams.palette || 'rainbow';
+                    const themeName = `rainbow-surface-${paletteName}-${Math.random().toString(36).substring(7)}`;
+
+                    const RainbowSurfaceThemeProvider = {
+                        name: themeName,
+                        label: "Rainbow (Surface)",
+                        category: "Custom",
+                        factory: (ctx, props) => {
+                            const structure = ctx.structure;
+                            if (!structure || !structure.models || structure.models.length === 0) {
+                                return {
+                                    granularity: 'group',
+                                    color: () => 0x808080,
+                                    props: props
+                                };
+                            }
+
+                            let minSeqId = Infinity;
+                            let maxSeqId = -Infinity;
+
+                            for (const unit of structure.units) {
+                                if (unit.model && unit.model.atomicHierarchy) {
+                                    const residues = unit.model.atomicHierarchy.residues;
+                                    const seqIds = residues.label_seq_id;
+                                    for (let i = 0; i < seqIds.rowCount; i++) {
+                                        const seqId = seqIds.value(i);
+                                        if (seqId !== null && seqId !== undefined) {
+                                            minSeqId = Math.min(minSeqId, seqId);
+                                            maxSeqId = Math.max(maxSeqId, seqId);
+                                        }
+                                    }
+                                }
+                            }
+
+                            const totalResidues = maxSeqId - minSeqId + 1;
+                            const gradient = generateGradient(paletteColors, totalResidues);
+
+                            return {
+                                granularity: 'group',
+                                color: (location) => {
+                                    try {
+                                        const unit = location.unit;
+                                        const element = location.element;
+                                        const residueIndex = unit.model.atomicHierarchy.residueAtomSegments.index[element];
+                                        const seqId = unit.model.atomicHierarchy.residues.label_seq_id.value(residueIndex);
+                                        const colorIndex = Math.max(0, Math.min(totalResidues - 1, seqId - minSeqId));
+                                        const hexColor = gradient[colorIndex];
+                                        return hexToMolstarColor(hexColor);
+                                    } catch (error) {
+                                        return 0x808080;
+                                    }
+                                },
+                                props: props
+                            };
+                        },
+                        getParams: () => ({}),
+                        defaultValues: {},
+                        isApplicable: (ctx) => !!ctx.structure
+                    };
+
+                    plugin.representation.structure.themes.colorThemeRegistry.add(RainbowSurfaceThemeProvider);
+                    colorThemeName = themeName;
+                    colorThemeParams = {};
+                }
+
+                console.log('Applying surface with color:', colorThemeName, colorThemeParams);
+
+                for (const structure of structures) {
+                    if (structure.components && structure.components.length > 0) {
+                        for (const component of structure.components) {
+                            // Skip water component if water is disabled
+                            const componentLabel = component.cell.obj?.label || '';
+                            if (componentLabel.toLowerCase() === 'water' && removeSolventEnabled) {
+                                console.log('Skipping surface for water (water is disabled)');
+                                continue;
+                            }
+
+                            await viewer.plugin.builders.structure.representation.addRepresentation(
+                                component.cell,
+                                {
+                                    type: 'gaussian-surface',
+                                    typeParams: {
+                                        quality: 'high',
+                                        alpha: opacityValue
+                                    },
+                                    color: colorThemeName,
+                                    colorParams: colorThemeParams
+                                }
+                            );
+                        }
+                    }
+                }
+
+                console.log('Surface applied successfully');
+            } catch (error) {
+                console.error('Error applying surface:', error);
+            }
+        }
+
+        // Update surface colors without recreating the surface
+        async function updateSurfaceColors() {
+            if (!viewer || !viewer.plugin) return;
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                // Check inherit toggle
+                const inheritToggle = document.getElementById('surface-inherit-toggle');
+                const colorPicker = document.getElementById('surface-color-picker');
+                const inheritColor = inheritToggle ? inheritToggle.checked : true;
+
+                for (const structure of structures) {
+                    if (structure.components && structure.components.length > 0) {
+                        for (const component of structure.components) {
+                            if (component.representations) {
+                                for (const repr of component.representations) {
+                                    // Update only Gaussian surface representations
+                                    if (repr.cell.transform.params?.type === 'gaussian-surface') {
+                                        // Determine the color theme to use
+                                        let colorThemeName, colorThemeParams;
+
+                                        if (!inheritColor && colorPicker) {
+                                            // Use custom surface color
+                                            const customColor = colorPicker.value;
+                                            const themeName = `custom-surface-color-${Math.random().toString(36).substring(7)}`;
+                                            const CustomSurfaceColorThemeProvider = {
+                                                name: themeName,
+                                                label: "Custom Surface Color",
+                                                category: "Custom",
+                                                factory: (ctx, props) => {
+                                                    return {
+                                                        granularity: "uniform",
+                                                        color: () => hexToMolstarColor(customColor),
+                                                        props: props
+                                                    };
+                                                },
+                                                getParams: () => ({}),
+                                                defaultValues: {},
+                                                isApplicable: (ctx) => !!ctx.structure
+                                            };
+                                            plugin.representation.structure.themes.colorThemeRegistry.add(CustomSurfaceColorThemeProvider);
+                                            colorThemeName = themeName;
+                                            colorThemeParams = {};
+                                        } else if ((currentColorMode === 'chain-id' || currentColorMode === 'custom-chain-colors') && Object.keys(chainColors).length > 0) {
+                                            // Use custom chain colors for surface
+                                            const themeName = `custom-chain-colors-surface-${Math.random().toString(36).substring(7)}`;
+                                            const CustomChainColorSurfaceThemeProvider = {
+                                                name: themeName,
+                                                label: "Custom Chain Colors (Surface)",
+                                                category: "Custom",
+                                                factory: (ctx, props) => {
+                                                    return {
+                                                        granularity: "group",
+                                                        color: (location) => {
+                                                            try {
+                                                                const unit = location.unit;
+                                                                const chainId = unit.chainGroupId || unit.label_asym_id || 'A';
+                                                                const hexColor = chainColors[chainId] || '#4ECDC4';
+                                                                return hexToMolstarColor(hexColor);
+                                                            } catch (error) {
+                                                                return 0x4ECDC4;
+                                                            }
+                                                        },
+                                                        props: props
+                                                    };
+                                                },
+                                                getParams: () => ({}),
+                                                defaultValues: {},
+                                                isApplicable: (ctx) => !!ctx.structure
+                                            };
+                                            plugin.representation.structure.themes.colorThemeRegistry.add(CustomChainColorSurfaceThemeProvider);
+                                            colorThemeName = themeName;
+                                            colorThemeParams = {};
+                                        } else if (currentColorMode === 'rainbow-sequence') {
+                                            // Use rainbow coloring for surface
+                                            const paletteColors = currentColorParams.colors || ['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF8000', '#FF0000'];
+                                            const paletteName = currentColorParams.palette || 'rainbow';
+                                            const themeName = `rainbow-surface-${paletteName}-${Math.random().toString(36).substring(7)}`;
+
+                                            const RainbowSurfaceThemeProvider = {
+                                                name: themeName,
+                                                label: "Rainbow (Surface)",
+                                                category: "Custom",
+                                                factory: (ctx, props) => {
+                                                    const structure = ctx.structure;
+                                                    if (!structure || !structure.models || structure.models.length === 0) {
+                                                        return {
+                                                            granularity: 'group',
+                                                            color: () => 0x808080,
+                                                            props: props
+                                                        };
+                                                    }
+
+                                                    let minSeqId = Infinity;
+                                                    let maxSeqId = -Infinity;
+                                                    for (const unit of structure.units) {
+                                                        if (unit.model && unit.model.atomicHierarchy) {
+                                                            const residues = unit.model.atomicHierarchy.residues;
+                                                            const seqIds = residues.label_seq_id;
+                                                            for (let i = 0; i < seqIds.rowCount; i++) {
+                                                                const seqId = seqIds.value(i);
+                                                                if (seqId !== null && seqId !== undefined) {
+                                                                    minSeqId = Math.min(minSeqId, seqId);
+                                                                    maxSeqId = Math.max(maxSeqId, seqId);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    const totalResidues = maxSeqId - minSeqId + 1;
+                                                    const gradient = generateGradient(paletteColors, totalResidues);
+
+                                                    return {
+                                                        granularity: 'group',
+                                                        color: (location) => {
+                                                            try {
+                                                                const unit = location.unit;
+                                                                const element = location.element;
+                                                                const residueIndex = unit.model.atomicHierarchy.residueAtomSegments.index[element];
+                                                                const seqId = unit.model.atomicHierarchy.residues.label_seq_id.value(residueIndex);
+                                                                const colorIndex = Math.max(0, Math.min(totalResidues - 1, seqId - minSeqId));
+                                                                const hexColor = gradient[colorIndex];
+                                                                return hexToMolstarColor(hexColor);
+                                                            } catch (error) {
+                                                                return 0x808080;
+                                                            }
+                                                        },
+                                                        props: props
+                                                    };
+                                                },
+                                                getParams: () => ({}),
+                                                defaultValues: {},
+                                                isApplicable: (ctx) => !!ctx.structure
+                                            };
+                                            plugin.representation.structure.themes.colorThemeRegistry.add(RainbowSurfaceThemeProvider);
+                                            colorThemeName = themeName;
+                                            colorThemeParams = {};
+                                        } else {
+                                            // Use current color mode
+                                            colorThemeName = currentColorMode;
+                                            colorThemeParams = currentColorParams;
+                                        }
+
+                                        // Update the surface representation
+                                        const update = plugin.build().to(repr.cell).update({
+                                            ...repr.cell.transform.params,
+                                            colorTheme: { name: colorThemeName, params: colorThemeParams }
+                                        });
+                                        await update.commit();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                console.log('Surface colors updated');
+            } catch (error) {
+                console.error('Error updating surface colors:', error);
+            }
+        }
+
+        // Apply illustrative style
+        async function applyIllustrativeStyle(enabled) {
+            if (!viewer) return;
+
+            try {
+                const plugin = viewer.plugin;
+
+                if (enabled) {
+                    await plugin.managers.structure.component.setOptions({
+                        ...plugin.managers.structure.component.state.options,
+                        ignoreLight: true
+                    });
+
+                    if (plugin.canvas3d) {
+                        const pp = plugin.canvas3d.props.postprocessing;
+                        plugin.canvas3d.setProps({
+                            postprocessing: {
+                                outline: {
+                                    name: 'on',
+                                    params: {
+                                        scale: 1,
+                                        threshold: 0.33,
+                                        includeTransparent: true
+                                    }
+                                },
+                                occlusion: {
+                                    name: 'on',
+                                    params: {
+                                        multiScale: { name: 'off', params: {} },
+                                        radius: 5,
+                                        bias: 0.8,
+                                        blurKernelSize: 15,
+                                        samples: 32,
+                                        resolutionScale: 1
+                                    }
+                                },
+                                shadow: { name: 'off', params: {} }
+                            }
+                        });
+                    }
+                } else {
+                    await plugin.managers.structure.component.setOptions({
+                        ...plugin.managers.structure.component.state.options,
+                        ignoreLight: false
+                    });
+
+                    if (plugin.canvas3d) {
+                        plugin.canvas3d.setProps({
+                            postprocessing: {
+                                outline: { name: 'off', params: {} },
+                                occlusion: { name: 'off', params: {} },
+                                shadow: { name: 'off', params: {} }
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error applying illustrative style:', error);
+            }
+        }
+
+        // Zoom to structure
+        function zoomTo() {
+            if (viewer) {
+                viewer.plugin.managers.camera.reset();
+            }
+        }
+
+        // Set background color
+        function setBackgroundColor(color) {
+            if (viewer) {
+                const bgColor = parseInt(color.replace('#', ''), 16);
+                viewer.plugin.canvas3d.setProps({
+                    renderer: {
+                        backgroundColor: bgColor
+                    }
+                });
+            }
+        }
+
+        // Toggle spinning
+        function spin(enabled) {
+            if (viewer) {
+                viewer.plugin.managers.camera.spin(enabled);
+            }
+        }
+
+        // Initialize on load (single mode only)
+        if (!isGridMode) {
+            window.addEventListener('load', async () => {
+                await initViewer();
+
+                // Initialize control panel
+                initControlPanel();
+
+                // Load structure if data is provided
+                const structureData = "{{structure_data}}";
+                if (structureData && structureData !== '' && structureData !== 'None') {
+                    await loadStructure(structureData, '{{structure_format}}');
+                }
+            });
+        }
+
+        // Initialize control panel
+        function initControlPanel() {
+            const panelEnabled = {{panel_enabled}};
+            const panel = document.getElementById('control-panel');
+
+            if (panelEnabled && panel) {
+                panel.classList.add('visible');
+                setupPanelControls();
+            }
+        }
+
+        // Setup panel control event handlers
+        function setupPanelControls() {
+            // Color mode dropdown toggle
+            const colorModeButton = document.getElementById('color-mode-button');
+            const colorModeDropdown = document.getElementById('color-mode-dropdown');
+            const colorModeOptions = document.querySelectorAll('.color-mode-option');
+
+            if (colorModeButton) {
+                colorModeButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    colorModeDropdown.classList.toggle('open');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    colorModeDropdown.classList.remove('open');
+                });
+            }
+
+            // Color mode selection
+            colorModeOptions.forEach(option => {
+                option.addEventListener('click', async (e) => {
+                    const mode = option.dataset.mode;
+
+                    if (mode === 'rainbow') {
+                        // Toggle rainbow submenu
+                        option.classList.toggle('expanded');
+                        return;
+                    }
+
+                    // Update active state
+                    colorModeOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+
+                    // Update label
+                    document.getElementById('color-mode-label').textContent =
+                        option.textContent.trim();
+
+                    // Show/hide relevant sections
+                    updateColorSections(mode);
+
+                    // Apply color mode
+                    currentColorMode = mode;
+                    currentColorParams = {};
+
+                    // Update chain colors UI if switching to chain mode
+                    if (mode === 'chain-id') {
+                        updateChainColorsUI();
+                    }
+
+                    await applyColorTheme();
+
+                    // Close dropdown
+                    colorModeDropdown.classList.remove('open');
+                });
+            });
+
+            // Rainbow palette selection
+            const paletteOptions = document.querySelectorAll('.palette-option');
+            paletteOptions.forEach(option => {
+                option.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const palette = option.dataset.palette;
+
+                    // Update active state
+                    paletteOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+
+                    // Update label
+                    document.getElementById('color-mode-label').textContent =
+                        `Rainbow (${option.textContent})`;
+
+                    // Apply rainbow coloring
+                    const paletteColors = {
+                        'rainbow': ['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF8000', '#FF0000'],
+                        'viridis': ['#440154', '#482878', '#3e4989', '#31688e', '#26828e', '#1f9e89', '#35b779', '#6ece58', '#b5de2b', '#fde724'],
+                        'plasma': ['#0d0887', '#46039f', '#7201a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#fdca26', '#f0f921'],
+                        'magma': ['#000004', '#1c1044', '#4f127b', '#812581', '#b5367a', '#e55964', '#fb8861', '#fec287', '#fcfdbf'],
+                        'blue-red': ['#0000FF', '#FF0000'],
+                        'pastel': ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', '#E0BBE4']
+                    };
+
+                    currentColorMode = 'rainbow-sequence';
+                    currentColorParams = {
+                        palette: palette,
+                        colors: paletteColors[palette]
+                    };
+
+                    updateColorSections('rainbow');
+                    await applyColorTheme();
+                    colorModeDropdown.classList.remove('open');
+                });
+            });
+
+            // Custom color selection
+            const colorOptions = document.querySelectorAll('.color-option');
+            colorOptions.forEach(option => {
+                option.addEventListener('click', async () => {
+                    const color = option.dataset.color;
+
+                    // Update active state
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+
+                    // Apply custom color
+                    if (currentColorMode === 'uniform') {
+                        currentColorParams = {
+                            value: parseInt(color.replace('#', ''), 16)
+                        };
+                        await applyColorTheme();
+                    }
+                });
+            });
+
+            // Secondary structure color pickers
+            const helixPicker = document.getElementById('helix-color');
+            const sheetPicker = document.getElementById('sheet-color');
+            const coilPicker = document.getElementById('coil-color');
+
+            if (helixPicker) {
+                helixPicker.addEventListener('input', async (e) => {
+                    if (currentColorMode === 'secondary-structure') {
+                        await applyColorTheme();
+                    }
+                });
+            }
+            if (sheetPicker) {
+                sheetPicker.addEventListener('input', async (e) => {
+                    if (currentColorMode === 'secondary-structure') {
+                        await applyColorTheme();
+                    }
+                });
+            }
+            if (coilPicker) {
+                coilPicker.addEventListener('input', async (e) => {
+                    if (currentColorMode === 'secondary-structure') {
+                        await applyColorTheme();
+                    }
+                });
+            }
+
+            // Illustrative toggle
+            const illustrativeToggle = document.getElementById('illustrative-toggle');
+            if (illustrativeToggle) {
+                illustrativeToggle.addEventListener('change', async (e) => {
+                    await applyIllustrativeStyle(e.target.checked);
+                });
+            }
+
+            // Surface toggle
+            const surfaceToggle = document.getElementById('surface-toggle');
+            const surfaceOptions = document.getElementById('surface-options');
+            if (surfaceToggle) {
+                // Set initial state
+                surfaceToggle.checked = surfaceEnabled;
+
+                surfaceToggle.addEventListener('change', async (e) => {
+                    const enabled = e.target.checked;
+                    surfaceEnabled = enabled; // Update the global variable
+
+                    // Show/hide surface options
+                    if (enabled) {
+                        surfaceOptions.classList.add('active');
+                        await applySurface();
+                    } else {
+                        surfaceOptions.classList.remove('active');
+                        await removeSurface();
+                    }
+                });
+            }
+
+            // Solvent toggle
+            const solventToggle = document.getElementById('solvent-toggle');
+            if (solventToggle) {
+                // Set initial state
+                solventToggle.checked = removeSolventEnabled;
+
+                solventToggle.addEventListener('change', async (e) => {
+                    removeSolventEnabled = e.target.checked;
+
+                    if (!viewer || !viewer.plugin) return;
+
+                    try {
+                        const plugin = viewer.plugin;
+                        const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                        for (const structure of structures) {
+                            if (structure.components) {
+                                for (const component of structure.components) {
+                                    const componentLabel = component.cell.obj?.label || '';
+
+                                    // Only process water component
+                                    if (componentLabel.toLowerCase() === 'water') {
+                                        if (removeSolventEnabled) {
+                                            // Hide water by deleting all its representations
+                                            if (component.representations && component.representations.length > 0) {
+                                                const builder = plugin.build();
+                                                for (const repr of component.representations) {
+                                                    builder.delete(repr.cell);
+                                                }
+                                                await builder.commit();
+                                            }
+                                        } else {
+                                            // Show water by recreating ball-and-stick representation
+                                            // Only add if component has no representations
+                                            if (!component.representations || component.representations.length === 0) {
+                                                await plugin.builders.structure.representation.addRepresentation(
+                                                    component.cell,
+                                                    { type: 'ball-and-stick' }
+                                                );
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error toggling water:', error);
+                    }
+                });
+            }
+
+            // Surface opacity controls
+            const opacitySlider = document.getElementById('surface-opacity-slider');
+            const opacityInput = document.getElementById('surface-opacity-input');
+
+            if (opacitySlider && opacityInput) {
+                opacitySlider.addEventListener('input', (e) => {
+                    opacityInput.value = e.target.value;
+                    surfaceOpacity = parseInt(e.target.value);
+                });
+
+                opacityInput.addEventListener('input', (e) => {
+                    let value = parseInt(e.target.value) || 0;
+                    value = Math.max(0, Math.min(100, value));
+                    opacitySlider.value = value;
+                    surfaceOpacity = value;
+                });
+
+                const updateSurfaceOpacity = async () => {
+                    if (surfaceToggle && surfaceToggle.checked) {
+                        await applySurface();
+                    }
+                };
+
+                opacitySlider.addEventListener('change', updateSurfaceOpacity);
+                opacityInput.addEventListener('change', updateSurfaceOpacity);
+            }
+
+            // Surface color controls
+            const surfaceInheritToggle = document.getElementById('surface-inherit-toggle');
+            const surfaceColorPickerWrapper = document.getElementById('surface-color-picker-wrapper');
+            const surfaceColorPicker = document.getElementById('surface-color-picker');
+
+            if (surfaceInheritToggle) {
+                surfaceInheritToggle.addEventListener('change', async (e) => {
+                    if (e.target.checked) {
+                        surfaceColorPickerWrapper.classList.remove('active');
+                    } else {
+                        surfaceColorPickerWrapper.classList.add('active');
+                    }
+
+                    if (surfaceToggle && surfaceToggle.checked) {
+                        await applySurface();
+                    }
+                });
+            }
+
+            if (surfaceColorPicker) {
+                surfaceColorPicker.addEventListener('change', async (e) => {
+                    if (surfaceToggle && surfaceToggle.checked && !surfaceInheritToggle.checked) {
+                        await applySurface();
+                    }
+                });
+            }
+        }
+
+        // Update color sections visibility
+        function updateColorSections(mode) {
+            const customColors = document.getElementById('custom-colors');
+            const secondaryColors = document.getElementById('secondary-colors');
+            const chainColors = document.getElementById('chain-colors');
+
+            // Hide all sections first
+            if (customColors) customColors.classList.remove('visible');
+            if (secondaryColors) secondaryColors.classList.remove('active');
+            if (chainColors) chainColors.classList.remove('active');
+
+            // Show relevant section
+            if (mode === 'uniform') {
+                if (customColors) customColors.classList.add('visible');
+            } else if (mode === 'secondary-structure') {
+                if (secondaryColors) secondaryColors.classList.add('active');
+            } else if (mode === 'chain-id') {
+                if (chainColors) chainColors.classList.add('active');
+            }
+        }
+
+        // Remove surface
+        async function removeSurface() {
+            if (!viewer || !viewer.plugin) return;
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                for (const structure of structures) {
+                    if (structure.components && structure.components.length > 0) {
+                        for (const component of structure.components) {
+                            if (component.representations) {
+                                for (const repr of component.representations) {
+                                    const params = repr.cell.transform.params;
+                                    const reprType = params?.type?.name || params?.type;
+                                    const isSurface = reprType === 'gaussian-surface' || reprType === 'molecular-surface';
+
+                                    if (isSurface) {
+                                        await plugin.build().delete(repr.cell).commit();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error removing surface:', error);
+            }
+        }
+
+        // Grid mode functions
+        async function initializeGridMode() {
+            const gridContainer = document.getElementById('grid-container');
+            const appContainer = document.getElementById('app-container');
+
+            // Show grid container, hide single viewer
+            gridContainer.style.display = 'grid';
+            appContainer.style.display = 'none';
+
+            const loadingEl = document.getElementById('loading');
+            loadingEl.style.display = 'block';
+            loadingEl.textContent = 'Initializing grid...';
+
+            const gridData = {{grid_data}};
+            const rows = {{rows}};
+            const cols = {{cols}};
+
+            try {
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cellData = gridData[row][col];
+                        const cellDiv = document.createElement('div');
+                        cellDiv.className = 'grid-cell';
+
+                        // Add label
+                        const label = document.createElement('div');
+                        label.className = 'grid-cell-label';
+                        label.textContent = `(${row},${col})`;
+                        cellDiv.appendChild(label);
+
+                        const viewerId = `viewer-${row}-${col}`;
+                        const viewerDiv = document.createElement('div');
+                        viewerDiv.id = viewerId;
+                        viewerDiv.className = 'grid-cell-viewer';
+
+                        if (cellData === null) {
+                            viewerDiv.className = 'grid-cell-empty';
+                            viewerDiv.textContent = 'Empty';
+                        }
+
+                        cellDiv.appendChild(viewerDiv);
+                        gridContainer.appendChild(cellDiv);
+
+                        // Create viewer if data exists
+                        if (cellData !== null) {
+                            try {
+                                const gridViewer = await molstar.Viewer.create(viewerId, {
+                                    layoutIsExpanded: false,
+                                    layoutShowControls: false,
+                                    layoutShowLeftPanel: false,
+                                    layoutShowSequence: false,
+                                    layoutShowLog: false,
+                                    viewportShowExpand: false,
+                                    viewportShowSelectionMode: false,
+                                    viewportShowAnimation: false
+                                });
+
+                                gridViewers.push({row, col, viewer: gridViewer});
+
+                                // Set background color
+                                const bgColor = parseInt('{{background_color}}'.replace('#', ''), 16);
+                                gridViewer.plugin.canvas3d.setProps({
+                                    renderer: {
+                                        backgroundColor: bgColor
+                                    }
+                                });
+
+                                // Load structure
+                                await loadStructureForGrid(gridViewer, cellData.data, cellData.format);
+
+                                // Hide water if removeSolvent is enabled
+                                if (removeSolventEnabled) {
+                                    await hideWaterForGrid(gridViewer);
+                                }
+
+                                // Apply color theme
+                                await applyColorThemeForGrid(gridViewer);
+
+                                // Apply surface if enabled
+                                if (surfaceEnabled) {
+                                    await applySurfaceForGrid(gridViewer);
+                                }
+
+                                // Apply illustrative style if enabled
+                                if (illustrativeEnabled) {
+                                    await applyIllustrativeStyle(gridViewer);
+                                }
+
+                                // Enable spinning if requested
+                                if (spinEnabled) {
+                                    gridViewer.plugin.managers.camera.spin(true);
+                                }
+
+                            } catch (error) {
+                                console.error(`Error creating viewer at (${row}, ${col}):`, error);
+                                viewerDiv.className = 'grid-cell-empty';
+                                viewerDiv.textContent = 'Error loading';
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error initializing grid:', error);
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        async function loadStructureForGrid(gridViewer, data, format) {
+            const mimeType = format === 'mmcif' ? 'chemical/x-mmcif' : 'chemical/x-pdb';
+            const blob = new Blob([data], { type: mimeType });
+            const blobUrl = URL.createObjectURL(blob);
+
+            try {
+                const dataObj = await gridViewer.plugin.builders.data.download({
+                    url: blobUrl,
+                    isBinary: false
+                });
+
+                const trajectory = await gridViewer.plugin.builders.structure.parseTrajectory(
+                    dataObj,
+                    format
+                );
+
+                await gridViewer.plugin.builders.structure.hierarchy.applyPreset(
+                    trajectory,
+                    'default'
+                );
+            } finally {
+                URL.revokeObjectURL(blobUrl);
+            }
+        }
+
+        async function applyColorThemeForGrid(gridViewer) {
+            const structures = gridViewer.plugin.managers.structure.hierarchy.current.structures;
+
+            for (const structure of structures) {
+                for (const component of structure.components) {
+                    if (component.representations) {
+                        for (const repr of component.representations) {
+                            const update = gridViewer.plugin.build().to(repr.cell).update({
+                                ...repr.cell.transform.params,
+                                colorTheme: {
+                                    name: currentColorMode,
+                                    params: currentColorParams
+                                }
+                            });
+                            await update.commit();
+                        }
+                    }
+                }
+            }
+        }
+
+        async function applySurfaceForGrid(gridViewer) {
+            const structures = gridViewer.plugin.managers.structure.hierarchy.current.structures;
+            const alphaValue = surfaceOpacity / 100;
+
+            for (const structure of structures) {
+                if (structure.components && structure.components.length > 0) {
+                    for (const component of structure.components) {
+                        // Skip water component if water is disabled
+                        const componentLabel = component.cell.obj?.label || '';
+                        if (componentLabel.toLowerCase() === 'water' && removeSolventEnabled) {
+                            continue;
+                        }
+
+                        await gridViewer.plugin.builders.structure.representation.addRepresentation(
+                            component.cell,
+                            {
+                                type: 'gaussian-surface',
+                                typeParams: {
+                                    quality: 'high',
+                                    alpha: alphaValue
+                                },
+                                color: currentColorMode,
+                                colorParams: currentColorParams
+                            }
+                        );
+                    }
+                }
+            }
+        }
+
+        async function hideWaterForGrid(gridViewer) {
+            try {
+                const plugin = gridViewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                for (const structure of structures) {
+                    if (structure.components) {
+                        for (const component of structure.components) {
+                            const componentLabel = component.cell.obj?.label || '';
+
+                            if (componentLabel.toLowerCase() === 'water') {
+                                if (component.representations && component.representations.length > 0) {
+                                    const builder = plugin.build();
+                                    for (const repr of component.representations) {
+                                        builder.delete(repr.cell);
+                                    }
+                                    await builder.commit();
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                // Silently handle error
+            }
+        }
+
+        // Expose functions for Python communication
+        window.molview = {
+            loadStructure,
+            applyColorTheme,
+            zoomTo,
+            setBackgroundColor,
+            spin,
+            isGridMode,
+            gridViewers
+        };
+
+        // Initialize grid mode if enabled
+        if (isGridMode) {
+            window.addEventListener('load', initializeGridMode);
+        }
+    </script>
+</body>
+</html>
