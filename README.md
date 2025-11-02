@@ -6,6 +6,8 @@ An IPython/Jupyter widget for interactive molecular visualization, based on [Mol
 
 
 
+
+
 ## Features
 
 - **Molstar-powered visualization** - Advanced molecular graphics engine
