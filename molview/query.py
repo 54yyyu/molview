@@ -95,7 +95,7 @@ def query(pdb_id, format='pdb'):
     return fetch_pdb(pdb_id, format)
 
 
-def fetch_alphafold(uniprot_id, version=4):
+def fetch_alphafold(uniprot_id, version=6):
     """
     Fetch an AlphaFold predicted structure from AlphaFold DB.
 
@@ -104,7 +104,7 @@ def fetch_alphafold(uniprot_id, version=4):
     uniprot_id : str
         UniProt ID (e.g., 'P00520', 'Q9Y6K9')
     version : int, optional
-        AlphaFold database version (default: 4)
+        AlphaFold database version (default: 6)
 
     Returns
     -------

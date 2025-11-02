@@ -72,6 +72,7 @@ class MolView:
         self.surface_opacity = 40
         self.illustrative_enabled = False
         self.spin_enabled = False
+        self.spin_speed = 0.2
         self.show_sequence = False
         self.show_animation = False
         self.remove_solvent = False
@@ -148,7 +149,7 @@ class MolView:
         # Default to PDB format if unable to detect
         return 'pdb'
 
-    def addModel(self, data, format=None, keepH=False, viewer=None):
+    def addModel(self, data, format=None, keepH=False, viewer=None, name=None):
         """
         Add a molecular model to the viewer.
 
@@ -163,6 +164,8 @@ class MolView:
             Keep hydrogen atoms (not implemented, for py3dmol compatibility)
         viewer : tuple, optional
             Grid position (row, col) for grid mode, e.g., viewer=(0, 1)
+        name : str, optional
+            Name for this structure. Defaults to 'Structure 1', 'Structure 2', etc.
 
         Returns
         -------
@@ -186,6 +189,12 @@ class MolView:
         >>> v.addModel(pdb1, viewer=(0, 0))
         >>> v.addModel(pdb2, viewer=(0, 1))
         >>> v.show()
+
+        >>> # Custom names for structures
+        >>> v = mv.view()
+        >>> v.addModel(pdb_data, name='Wild Type')
+        >>> v.addModel(mutant_data, name='L99A Mutant')
+        >>> v.show()
         """
         # Auto-detect format if not specified
         if format is None:
@@ -198,22 +207,44 @@ class MolView:
         elif format not in ['pdb', 'sdf']:
             raise ValueError(f"Unsupported format '{format}'. Use 'pdb', 'mmcif', or 'sdf'")
 
-        model = {
-            'data': data,
-            'format': format,
-            'keepH': keepH
-        }
-
         # Handle grid mode
         if self.viewergrid is not None:
+            # Generate default name for grid mode
+            if name is None:
+                if viewer is None:
+                    # Will be auto-placed, count existing models
+                    existing_count = sum(1 for row in self.grid_models for cell in row if cell is not None)
+                    name = f'Structure {existing_count + 1}'
+                else:
+                    row, col = viewer
+                    name = f'Structure ({row},{col})'
+
+            model = {
+                'data': data,
+                'format': format,
+                'keepH': keepH,
+                'name': name
+            }
+
             if viewer is None:
-                raise ValueError("viewer=(row, col) parameter required in grid mode")
+                # Auto-place in next available cell
+                viewer = self._get_next_available_cell()
             row, col = viewer
             if not (0 <= row < self.rows and 0 <= col < self.cols):
                 raise ValueError(f"viewer position ({row}, {col}) out of bounds for {self.rows}x{self.cols} grid")
             self.grid_models[row][col] = model
         else:
-            # Single viewer mode
+            # Single viewer mode - generate default name
+            if name is None:
+                name = f'Structure {len(self.models) + 1}'
+
+            model = {
+                'data': data,
+                'format': format,
+                'keepH': keepH,
+                'name': name
+            }
+
             self.models.append(model)
             self.current_model_index = len(self.models) - 1
 
@@ -377,6 +408,38 @@ class MolView:
         self.illustrative_enabled = enabled
         return self
 
+    def setLayout(self, mode):
+        """
+        Set layout mode (single or grid).
+
+        Note: This method is primarily for interactive use with panel=True.
+        Grid dimensions are auto-calculated based on number of loaded models.
+
+        Parameters
+        ----------
+        mode : str
+            Layout mode: 'single' or 'grid'
+
+        Returns
+        -------
+        self
+            For method chaining
+
+        Examples
+        --------
+        >>> v = mv.view(panel=True)
+        >>> v.addModel(pdb1)
+        >>> v.addModel(pdb2)
+        >>> v.setLayout('grid')  # Switch to grid view
+        >>> v.setLayout('single')  # Switch back to single view
+        """
+        if mode not in ['single', 'grid']:
+            raise ValueError("mode must be 'single' or 'grid'")
+
+        # This will be handled by JavaScript in the viewer
+        # The actual grid is created dynamically from loaded models
+        return self
+
     def zoomTo(self, sel=None):
         """
         Reset camera to fit the structure.
@@ -398,7 +461,7 @@ class MolView:
         # Will be handled by JavaScript
         return self
 
-    def spin(self, enabled=True, speed=1):
+    def spin(self, enabled=True, speed=0.2):
         """
         Enable continuous rotation.
 
@@ -407,7 +470,7 @@ class MolView:
         enabled : bool, optional
             Enable spinning (default: True)
         speed : float, optional
-            Rotation speed (not implemented yet)
+            Rotation speed (default: 0.2)
 
         Returns
         -------
@@ -417,9 +480,11 @@ class MolView:
         Examples
         --------
         >>> v.spin(True)
+        >>> v.spin(True, speed=1.0)
         >>> v.spin(False)
         """
         self.spin_enabled = enabled
+        self.spin_speed = speed
         return self
 
     def removeSolvent(self, enabled=True):
@@ -509,8 +574,9 @@ class MolView:
         # Escape HTML for srcdoc attribute
         escaped_html = html.escape(html_content)
 
-        # Calculate total width (add panel width if enabled)
-        panel_width = 280 if self.panel else 0
+        # Calculate total width (add panel width if enabled OR if in grid mode)
+        # In grid mode, we need to reserve space for panel since it will show when switching to single view
+        panel_width = 280 if (self.panel or self.viewergrid is not None) else 0
         total_width = self.width + panel_width
 
         # Create iframe with srcdoc
@@ -524,6 +590,41 @@ class MolView:
         ></iframe>'''
 
         return iframe_html
+
+    def _calculate_grid_dimensions(self, num_models):
+        """
+        Calculate optimal grid dimensions for n models.
+
+        Args:
+            num_models: Number of models to display
+
+        Returns:
+            tuple: (rows, cols) for grid layout
+        """
+        import math
+
+        if num_models == 0:
+            return (1, 1)
+
+        rows = math.ceil(math.sqrt(num_models))
+        cols = math.ceil(num_models / rows)
+        return (rows, cols)
+
+    def _get_next_available_cell(self):
+        """
+        Find next empty grid cell for auto-placement.
+
+        Returns:
+            tuple: (row, col) of next available cell
+
+        Raises:
+            ValueError: If grid is full
+        """
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if self.grid_models[row][col] is None:
+                    return (row, col)
+        raise ValueError(f"Grid is full ({self.rows}x{self.cols})")
 
     def _generate_single_html(self, bool_to_js):
         """Generate HTML for single viewer mode."""
@@ -556,6 +657,7 @@ class MolView:
         html = html.replace('{{surface_opacity}}', str(self.surface_opacity))
         html = html.replace('{{illustrative_enabled}}', bool_to_js(self.illustrative_enabled))
         html = html.replace('{{spin_enabled}}', bool_to_js(self.spin_enabled))
+        html = html.replace('{{spin_speed}}', str(self.spin_speed))
         html = html.replace('{{show_sequence}}', bool_to_js(self.show_sequence))
         html = html.replace('{{show_animation}}', bool_to_js(self.show_animation))
         html = html.replace('{{remove_solvent}}', bool_to_js(self.remove_solvent))
@@ -567,6 +669,16 @@ class MolView:
         html = html.replace('{{rows}}', '1')
         html = html.replace('{{cols}}', '1')
         html = html.replace('{{grid_data}}', '[[]]')
+
+        # Pass all models for multi-structure support
+        all_models_data = []
+        for model in self.models:
+            all_models_data.append({
+                'name': model.get('name', 'Structure'),
+                'data': model['data'],
+                'format': model['format']
+            })
+        html = html.replace('{{all_models}}', json.dumps(all_models_data))
 
         return html
 
@@ -588,7 +700,8 @@ class MolView:
                 else:
                     cell_json = {
                         'data': cell['data'],  # Raw data, json.dumps will escape
-                        'format': cell['format']
+                        'format': cell['format'],
+                        'name': cell.get('name', 'Structure')
                     }
                     row_data.append(cell_json)
             grid_data_processed.append(row_data)
@@ -606,6 +719,7 @@ class MolView:
         html = html.replace('{{surface_opacity}}', str(self.surface_opacity))
         html = html.replace('{{illustrative_enabled}}', bool_to_js(self.illustrative_enabled))
         html = html.replace('{{spin_enabled}}', bool_to_js(self.spin_enabled))
+        html = html.replace('{{spin_speed}}', str(self.spin_speed))
         html = html.replace('{{remove_solvent}}', bool_to_js(self.remove_solvent))
 
         # Grid mode flag
@@ -617,6 +731,7 @@ class MolView:
         html = html.replace('{{show_animation}}', 'false')
         html = html.replace('{{structure_data}}', '')
         html = html.replace('{{structure_format}}', 'pdb')
+        html = html.replace('{{all_models}}', '[]')  # Empty for grid mode
 
         return html
 

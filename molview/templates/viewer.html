@@ -188,6 +188,29 @@
             border-color: hsl(222.2 84% 4.9%);
             border-width: 3px;
         }
+        .custom-color-picker-option {
+            position: relative;
+            overflow: hidden;
+            padding: 0;
+            border: 2px solid #ccc;
+        }
+        .custom-color-picker-option:hover {
+            border-color: #666;
+        }
+        .custom-color-picker-option.active {
+            border-color: hsl(222.2 84% 4.9%);
+            border-width: 3px;
+        }
+        #custom-color-picker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
 
         /* Secondary Structure Color Customization */
         .secondary-colors-section {
@@ -257,6 +280,120 @@
         .chain-color-picker:hover {
             border-color: hsl(220, 9%, 46%);
             transform: scale(1.1);
+        }
+
+        /* pLDDT Legend */
+        .plddt-info-section {
+            margin: 10px 0;
+            padding: 10px 0;
+            border-top: 1px solid hsl(214.3 31.8% 91.4%);
+            display: none;
+        }
+        
+        .plddt-info-section.active {
+            display: block;
+        }
+        
+        .plddt-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .plddt-info-header h4 {
+            margin: 0;
+            font-size: 13px;
+            color: hsl(220, 9%, 46%);
+            font-weight: 600;
+        }
+        
+        .plddt-info-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .plddt-info-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .plddt-info-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: hsl(214.3 31.8% 91.4%);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .plddt-info-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .plddt-info-slider {
+            background-color: hsl(220, 9%, 46%);
+        }
+        
+        input:checked + .plddt-info-slider:before {
+            transform: translateX(20px);
+        }
+        
+        .plddt-info-content {
+            display: none;
+        }
+        
+        .plddt-info-content.active {
+            display: block;
+        }
+        
+        .plddt-info-panel {
+            background: hsl(210 40% 98%);
+            border: 1px solid hsl(214.3 31.8% 91.4%);
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .plddt-description {
+            font-size: 11px;
+            color: hsl(220, 9%, 46%);
+            margin-bottom: 12px;
+        }
+        
+        .plddt-legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .plddt-item {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            color: hsl(220, 9%, 46%);
+        }
+        
+        .plddt-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 8px;
+            border: 1px solid hsl(214.3 31.8% 91.4%);
         }
 
         /* Style Toggles */
@@ -381,9 +518,89 @@
         .surface-color-picker-wrapper.active {
             display: block;
         }
+
+        /* Layout Mode Button Styles */
+        .layout-mode-btn.active {
+            background: hsl(210 40% 98%) !important;
+            border-color: hsl(220, 9%, 46%) !important;
+            color: hsl(220, 9%, 46%);
+            font-weight: 600;
+        }
+        .layout-mode-btn:hover {
+            background: hsl(210 40% 96%) !important;
+        }
+
+        /* File List Styles */
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            background: hsl(0 0% 98%);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .file-item:hover {
+            background: hsl(210 40% 96%);
+            border-color: hsl(214.3 31.8% 91.4%);
+        }
+        .file-item.active {
+            background: hsl(210 40% 98%);
+            border-color: hsl(220, 9%, 46%);
+            font-weight: 600;
+        }
+        .file-item-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .file-download-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            margin-right: 8px;
+        }
+        .file-download-icon:hover {
+            opacity: 1;
+            color: #3498db;
+        }
+        .file-download-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+        .file-delete-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .file-delete-icon:hover {
+            opacity: 1;
+            color: #e74c3c;
+        }
+        .file-delete-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+
         /* Grid Mode Styles */
         #grid-container {
-            width: 100%;
+            width: {{width}}px;
             height: {{height}}px;
             display: grid;
             grid-template-rows: repeat({{rows}}, 1fr);
@@ -399,6 +616,13 @@
             overflow: hidden;
             position: relative;
             min-height: 200px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .grid-cell:hover {
+            border-color: hsl(221, 83%, 53%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
         }
         .grid-cell-label {
             position: absolute;
@@ -422,6 +646,54 @@
             justify-content: center;
             color: #999;
             font-size: 13px;
+        }
+        .grid-expand-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.3;
+            transition: all 0.2s ease;
+            z-index: 25;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        .grid-expand-button:hover {
+            opacity: 0.9;
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+        .grid-cell.loading {
+            background: #f5f5f5;
+        }
+        .grid-cell.loading .grid-cell-viewer::after {
+            content: 'Generating preview...';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 13px;
+        }
+        .grid-cell.active {
+            border-color: hsl(221, 83%, 53%);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+
+        /* Hide Molstar logo */
+        .msp-plugin-content > svg,
+        .msp-plugin > svg,
+        canvas + svg {
+            display: none !important;
         }
     </style>
 </head>
@@ -453,6 +725,7 @@
                         <div class="color-mode-option" data-mode="residue-name">Residue</div>
                         <div class="color-mode-option" data-mode="secondary-structure">Secondary</div>
                         <div class="color-mode-option" data-mode="chain-id">Chain</div>
+                        <div class="color-mode-option" id="plddt-option" data-mode="plddt-confidence" style="display: none;">pLDDT</div>
                         <div class="color-mode-option" data-mode="rainbow">
                             <div class="rainbow-main-label">Rainbow</div>
                             <div class="rainbow-palette-options">
@@ -464,7 +737,6 @@
                                 <div class="palette-option" data-palette="pastel">Pastel</div>
                             </div>
                         </div>
-                        <div class="color-mode-option" id="plddt-option" data-mode="plddt-confidence" style="display: none;">pLDDT</div>
                     </div>
                 </div>
 
@@ -479,8 +751,10 @@
                         <div class="color-option" data-color="#FF922B" style="background-color: #FF922B;" title="Orange"></div>
                         <div class="color-option" data-color="#DA77F2" style="background-color: #DA77F2;" title="Purple"></div>
                         <div class="color-option" data-color="#FF8CC8" style="background-color: #FF8CC8;" title="Pink"></div>
-                        <div class="color-option" data-color="#15AABF" style="background-color: #15AABF;" title="Cyan"></div>
                         <div class="color-option" data-color="#868E96" style="background-color: #868E96;" title="Gray"></div>
+                        <div class="color-option custom-color-picker-option" title="Custom Color">
+                            <input type="color" id="custom-color-picker" value="#4ECDC4" style="width: 100%; height: 100%; border: none; cursor: pointer;">
+                        </div>
                     </div>
                 </div>
 
@@ -509,6 +783,43 @@
                     </div>
                 </div>
 
+                <!-- pLDDT Confidence Legend -->
+                <div id="plddt-legend" class="plddt-info-section">
+                    <div class="plddt-info-header">
+                        <h4>pLDDT Confidence Info</h4>
+                        <label class="plddt-info-switch">
+                            <input type="checkbox" id="plddt-info-toggle">
+                            <span class="plddt-info-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div id="plddt-info-content" class="plddt-info-content">
+                        <div class="plddt-info-panel">
+                            <div class="plddt-description">
+                                Predicted structures are colored by confidence (pLDDT score):
+                            </div>
+                            <div class="plddt-legend">
+                                <div class="plddt-item">
+                                    <div class="plddt-color" style="background: #0053D6;"></div>
+                                    <span>Very High (&gt;90)</span>
+                                </div>
+                                <div class="plddt-item">
+                                    <div class="plddt-color" style="background: #65CBF3;"></div>
+                                    <span>High (70-90)</span>
+                                </div>
+                                <div class="plddt-item">
+                                    <div class="plddt-color" style="background: #FFDB13;"></div>
+                                    <span>Low (50-70)</span>
+                                </div>
+                                <div class="plddt-item">
+                                    <div class="plddt-color" style="background: #FF7D45;"></div>
+                                    <span>Very Low (&lt;50)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Style Toggles -->
                 <div class="style-toggles">
                     <div class="toggle-item">
@@ -529,6 +840,13 @@
                         <span class="toggle-label">Remove Solvent</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="solvent-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item" id="spin-toggle-item" style="display: none;">
+                        <span class="toggle-label">Spin</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="spin-toggle">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -558,6 +876,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Layout Section -->
+            <div class="panel-section" id="layout-section">
+                <h3>Layout</h3>
+                <div style="display: flex; gap: 8px;">
+                    <button id="single-view-btn" class="layout-mode-btn active" style="flex: 1; padding: 8px; border: 1px solid hsl(214.3 31.8% 91.4%); background: hsl(210 40% 98%); border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s;">Single</button>
+                    <button id="grid-view-btn" class="layout-mode-btn" style="flex: 1; padding: 8px; border: 1px solid hsl(214.3 31.8% 91.4%); background: white; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s;">Grid</button>
+                </div>
+            </div>
+
+            <!-- Files Section -->
+            <div class="panel-section" id="files-section">
+                <h3>Files</h3>
+                <div id="file-list" style="max-height: 200px; overflow-y: auto;">
+                    <div style="color: #999; font-size: 11px; text-align: center; padding: 10px;">No files loaded</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -569,9 +904,24 @@
         let surfaceOpacity = {{surface_opacity}};
         let illustrativeEnabled = {{illustrative_enabled}};
         let spinEnabled = {{spin_enabled}};
+        let spinSpeed = {{spin_speed}};
         let removeSolventEnabled = {{remove_solvent}};
         const isGridMode = {{is_grid_mode}};
+        const viewerWidth = {{width}};
+        const viewerHeight = {{height}};
         const gridViewers = [];
+
+        // Multi-structure management
+        let loadedModels = [];  // Array of {name, data, format}
+        let currentModelIndex = -1;
+        let currentLayoutMode = isGridMode ? 'grid' : 'single';  // 'single' or 'grid'
+
+        // Grid viewer management for large datasets
+        let activeGridViewers = new Set(); // Track which grid viewers are active
+        let gridPreviewImages = []; // Store preview images for grid items
+        let gridViewerOrder = []; // Track order of activation for LRU management
+        const MAX_ACTIVE_VIEWERS = 16; // Maximum active 3D viewers
+        const PREVIEW_MODE_THRESHOLD = 8; // Use preview mode when > 8 structures
 
         // Chain color customization
         let chainColors = {}; // Store custom colors for each chain ID
@@ -644,6 +994,10 @@
 
         function hexToMolstarColor(hex) {
             return parseInt(hex.replace('#', ''), 16);
+        }
+
+        function molstarColorToHex(color) {
+            return '#' + color.toString(16).padStart(6, '0');
         }
 
         // Initialize Molstar viewer
@@ -732,12 +1086,30 @@
 
                 // Apply illustrative style if enabled
                 if (illustrativeEnabled) {
-                    await applyIllustrativeStyle();
+                    await applyIllustrativeStyle(illustrativeEnabled);
                 }
 
                 // Enable spinning if requested
                 if (spinEnabled) {
-                    viewer.plugin.managers.camera.spin(true);
+                    // Delay spin activation to ensure viewer is fully ready
+                    setTimeout(() => {
+                        if (viewer && viewer.plugin && viewer.plugin.canvas3d) {
+                            try {
+                                const canvas = viewer.plugin.canvas3d;
+                                const trackball = canvas.props.trackball;
+                                
+                                canvas.setProps({
+                                    trackball: {
+                                        ...trackball,
+                                        animate: { name: 'spin', params: { speed: spinSpeed } }
+                                    }
+                                });
+                                console.log('Spin enabled with speed:', spinSpeed);
+                            } catch (e) {
+                                console.error('Error enabling spin:', e);
+                            }
+                        }
+                    }, 500);
                 }
 
                 console.log('Structure loaded successfully');
@@ -767,26 +1139,41 @@
                     return;
                 }
 
+                // Handle pLDDT confidence coloring specially
+                if (currentColorMode === 'plddt-confidence') {
+                    await applyPLDDTColoring();
+                    return;
+                }
+
                 // Handle secondary structure with custom colors
                 if (currentColorMode === 'secondary-structure') {
-                    const helixColor = document.getElementById('helix-color')?.value || '#0FA3FF';
-                    const sheetColor = document.getElementById('sheet-color')?.value || '#24B235';
-                    const coilColor = document.getElementById('coil-color')?.value || '#E8E8E8';
+                    // If currentColorParams already has custom colors from Python, keep them
+                    // Otherwise, read from UI color pickers
+                    if (!currentColorParams.colors || !currentColorParams.colors.params) {
+                        const helixPicker = document.getElementById('helix-color');
+                        const sheetPicker = document.getElementById('sheet-color');
+                        const coilPicker = document.getElementById('coil-color');
+                        
+                        const helixColor = helixPicker?.value || '#0FA3FF';
+                        const sheetColor = sheetPicker?.value || '#24B235';
+                        const coilColor = coilPicker?.value || '#E8E8E8';
 
-                    currentColorParams = {
-                        colors: {
-                            name: 'custom',
-                            params: {
-                                alphaHelix: hexToMolstarColor(helixColor),
-                                threeTenHelix: hexToMolstarColor(helixColor),
-                                piHelix: hexToMolstarColor(helixColor),
-                                betaStrand: hexToMolstarColor(sheetColor),
-                                betaTurn: hexToMolstarColor(sheetColor),
-                                coil: hexToMolstarColor(coilColor),
-                                bend: hexToMolstarColor(coilColor)
+                        currentColorParams = {
+                            colors: {
+                                name: 'custom',
+                                params: {
+                                    alphaHelix: hexToMolstarColor(helixColor),
+                                    threeTenHelix: hexToMolstarColor(helixColor),
+                                    piHelix: hexToMolstarColor(helixColor),
+                                    betaStrand: hexToMolstarColor(sheetColor),
+                                    betaTurn: hexToMolstarColor(sheetColor),
+                                    coil: hexToMolstarColor(coilColor),
+                                    bend: hexToMolstarColor(coilColor)
+                                }
                             }
-                        }
-                    };
+                        };
+                    }
+                    // Otherwise currentColorParams already contains the values from Python
                 }
 
                 // Handle other color themes - update all representations individually
@@ -901,6 +1288,110 @@
             }
         }
 
+        // Apply pLDDT confidence coloring
+        async function applyPLDDTColoring() {
+            if (!viewer || !viewer.plugin) {
+                console.warn('Viewer is null, skipping pLDDT coloring');
+                return;
+            }
+
+            try {
+                const plugin = viewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                if (!structures || structures.length === 0) {
+                    console.warn('No structures found for pLDDT coloring');
+                    return;
+                }
+
+                // Check if structure has B-factor data (pLDDT is stored in B-factor field)
+                const structureData = structures[0].cell.obj?.data;
+                if (!structureData) {
+                    console.warn('No structure data found');
+                    return;
+                }
+
+                const model = structureData.models[0];
+                if (!model || !model.atomicConformation || !model.atomicConformation.B_iso_or_equiv) {
+                    console.warn('No B-factor data found for pLDDT coloring');
+                    return;
+                }
+
+                console.log('Applying pLDDT confidence coloring');
+
+                // Create unique theme name for this instance
+                const themeName = `plddt-confidence-${Math.random().toString(36).substring(7)}`;
+
+                // Define the pLDDT color theme provider
+                const PLDDTColorThemeProvider = {
+                    name: themeName,
+                    label: "pLDDT Confidence",
+                    category: "Validation",
+                    factory: (ctx, props) => {
+                        return {
+                            granularity: "group",
+                            color: (location) => {
+                                if (location.element !== undefined) {
+                                    const model = ctx.structure.models[0];
+                                    if (model && model.atomicConformation && model.atomicConformation.B_iso_or_equiv) {
+                                        // Get B-factor value (pLDDT can be stored as 0-100 or 0-1)
+                                        let bFactor = model.atomicConformation.B_iso_or_equiv.value(location.element);
+                                        
+                                        // Normalize to 0-1 range if stored as 0-100
+                                        if (bFactor > 1) {
+                                            bFactor = bFactor / 100;
+                                        }
+                                        
+                                        // Apply offset for better color mapping
+                                        // bFactor = bFactor - 0.04;
+                                        
+                                        // pLDDT confidence color scheme
+                                        if (bFactor > 0.9) {
+                                            return 0x0053D6; // Dark blue - very high confidence (>90)
+                                        } else if (bFactor > 0.7) {
+                                            return 0x65CBF3; // Light blue - confident (70-90)
+                                        } else if (bFactor > 0.5) {
+                                            return 0xFFDB13; // Yellow - low confidence (50-70)
+                                        } else {
+                                            return 0xFF7D45; // Orange - very low confidence (<50)
+                                        }
+                                    }
+                                }
+                                return 0x777777; // Default gray
+                            },
+                            props: props,
+                            description: 'Color by pLDDT confidence score'
+                        };
+                    },
+                    getParams: () => ({}),
+                    defaultValues: {},
+                    isApplicable: (ctx) => {
+                        const model = ctx.structure.models[0];
+                        return !!(model && model.atomicConformation && model.atomicConformation.B_iso_or_equiv);
+                    }
+                };
+
+                // Register the color theme
+                plugin.representation.structure.themes.colorThemeRegistry.add(PLDDTColorThemeProvider);
+                console.log(`Registered pLDDT color theme: ${themeName}`);
+
+                // Apply the theme to all structures
+                for (const structure of structures) {
+                    if (structure.components && structure.components.length > 0) {
+                        await plugin.managers.structure.component.updateRepresentationsTheme(
+                            structure.components,
+                            { color: themeName }
+                        );
+                    }
+                }
+
+                console.log('Successfully applied pLDDT confidence coloring');
+
+            } catch (error) {
+                console.error('Error applying pLDDT coloring:', error);
+            }
+        }
+
         // Apply solvent removal by using structure overpaint
         async function applySolventRemoval() {
             if (!viewer || !viewer.plugin) return;
@@ -987,21 +1478,23 @@
                     if (structureData && structureData.models && structureData.models.length > 0) {
                         const model = structureData.models[0];
 
-                        // Check for pLDDT in atom properties (b_iso_or_equiv typically stores pLDDT)
-                        if (model.atomicHierarchy && model.atomicHierarchy.atoms) {
-                            const atoms = model.atomicHierarchy.atoms;
-                            // Check if we have b-factor like data that could be pLDDT
-                            if (atoms.B_iso_or_equiv) {
-                                hasPLDDT = true;
-                                console.log('Detected pLDDT data in structure');
+                        // Check for pLDDT in atomicConformation (B-factor field typically stores pLDDT)
+                        if (model.atomicConformation && model.atomicConformation.B_iso_or_equiv) {
+                            hasPLDDT = true;
+                            console.log('Detected pLDDT data in structure');
 
-                                // Show pLDDT option in color dropdown
-                                const plddtOption = document.getElementById('plddt-option');
-                                if (plddtOption) {
-                                    plddtOption.style.display = 'block';
-                                }
-                                return;
+                            // Show pLDDT option in color dropdown
+                            const plddtOption = document.getElementById('plddt-option');
+                            if (plddtOption) {
+                                plddtOption.style.display = 'block';
                             }
+
+                            // If pLDDT mode is already active, update sections to show the info panel
+                            if (currentColorMode === 'plddt-confidence') {
+                                updateColorSections(currentColorMode);
+                            }
+
+                            return;
                         }
                     }
                 }
@@ -1372,6 +1865,59 @@
                     colorThemeName = themeName;
                     colorThemeParams = {};
                 }
+                // Handle pLDDT mode for surface
+                else if (currentColorMode === 'plddt-confidence') {
+                    const themeName = `plddt-surface-${Math.random().toString(36).substring(7)}`;
+
+                    const PLDDTSurfaceThemeProvider = {
+                        name: themeName,
+                        label: "pLDDT Confidence (Surface)",
+                        category: "Validation",
+                        factory: (ctx, props) => {
+                            return {
+                                granularity: "group",
+                                color: (location) => {
+                                    if (location.element !== undefined) {
+                                        const model = ctx.structure.models[0];
+                                        if (model && model.atomicConformation && model.atomicConformation.B_iso_or_equiv) {
+                                            let bFactor = model.atomicConformation.B_iso_or_equiv.value(location.element);
+                                            
+                                            // Normalize to 0-1 range if stored as 0-100
+                                            if (bFactor > 1) {
+                                                bFactor = bFactor / 100;
+                                            }
+                                            
+                                            // Apply offset
+                                            // bFactor = bFactor - 0.04;
+                                            
+                                            if (bFactor > 0.9) {
+                                                return 0x0053D6; // Dark blue - very high confidence
+                                            } else if (bFactor > 0.7) {
+                                                return 0x65CBF3; // Light blue - confident
+                                            } else if (bFactor > 0.5) {
+                                                return 0xFFDB13; // Yellow - low confidence
+                                            } else {
+                                                return 0xFF7D45; // Orange - very low confidence
+                                            }
+                                        }
+                                    }
+                                    return 0x777777; // Default gray
+                                },
+                                props: props
+                            };
+                        },
+                        getParams: () => ({}),
+                        defaultValues: {},
+                        isApplicable: (ctx) => {
+                            const model = ctx.structure.models[0];
+                            return !!(model && model.atomicConformation && model.atomicConformation.B_iso_or_equiv);
+                        }
+                    };
+
+                    plugin.representation.structure.themes.colorThemeRegistry.add(PLDDTSurfaceThemeProvider);
+                    colorThemeName = themeName;
+                    colorThemeParams = {};
+                }
 
                 console.log('Applying surface with color:', colorThemeName, colorThemeParams);
 
@@ -1653,8 +2199,23 @@
 
         // Toggle spinning
         function spin(enabled) {
-            if (viewer) {
-                viewer.plugin.managers.camera.spin(enabled);
+            if (viewer && viewer.plugin && viewer.plugin.canvas3d) {
+                try {
+                    const canvas = viewer.plugin.canvas3d;
+                    const trackball = canvas.props.trackball;
+                    canvas.setProps({
+                        trackball: {
+                            ...trackball,
+                            animate: enabled 
+                                ? { name: 'spin', params: { speed: spinSpeed } }
+                                : { name: 'off', params: {} }
+                        }
+                    });
+                    spinEnabled = enabled;
+                    console.log('Spin toggled:', enabled);
+                } catch (e) {
+                    console.error('Error toggling spin:', e);
+                }
             }
         }
 
@@ -1666,10 +2227,34 @@
                 // Initialize control panel
                 initControlPanel();
 
-                // Load structure if data is provided
-                const structureData = "{{structure_data}}";
-                if (structureData && structureData !== '' && structureData !== 'None') {
-                    await loadStructure(structureData, '{{structure_format}}');
+                // Parse and populate all models from Python
+                let modelsLoaded = false;
+                try {
+                    const allModels = {{all_models}};
+                    if (Array.isArray(allModels) && allModels.length > 0) {
+                        // Populate loadedModels with all models
+                        for (const model of allModels) {
+                            addModel(model.name, model.data, model.format);
+                        }
+
+                        // Set current model to first one and load it
+                        currentModelIndex = 0;
+                        const firstModel = allModels[0];
+                        await loadStructure(firstModel.data, firstModel.format);
+                        modelsLoaded = true;
+                    }
+                } catch (error) {
+                    console.error('Error parsing all_models:', error);
+                }
+
+                // Fallback to old single structure approach if no models loaded
+                if (!modelsLoaded) {
+                    const structureData = "{{structure_data}}";
+                    if (structureData && structureData !== '' && structureData !== 'None') {
+                        addModel('Structure', structureData, '{{structure_format}}');
+                        currentModelIndex = 0;
+                        await loadStructure(structureData, '{{structure_format}}');
+                    }
                 }
             });
         }
@@ -1715,8 +2300,10 @@
                         return;
                     }
 
-                    // Update active state
+                    // Update active state - remove from all main options and palette options
                     colorModeOptions.forEach(opt => opt.classList.remove('active'));
+                    const paletteOptions = document.querySelectorAll('.palette-option');
+                    paletteOptions.forEach(opt => opt.classList.remove('active'));
                     option.classList.add('active');
 
                     // Update label
@@ -1729,6 +2316,27 @@
                     // Apply color mode
                     currentColorMode = mode;
                     currentColorParams = {};
+
+                    // For uniform mode, get the currently active color
+                    if (mode === 'uniform') {
+                        const activeColorOption = document.querySelector('.color-option.active');
+                        let colorToUse = '#4ECDC4'; // Default color
+
+                        if (activeColorOption) {
+                            if (activeColorOption.classList.contains('custom-color-picker-option')) {
+                                // Use custom picker value
+                                const customPicker = document.getElementById('custom-color-picker');
+                                colorToUse = customPicker ? customPicker.value : colorToUse;
+                            } else if (activeColorOption.dataset.color) {
+                                // Use preset color
+                                colorToUse = activeColorOption.dataset.color;
+                            }
+                        }
+
+                        currentColorParams = {
+                            value: parseInt(colorToUse.replace('#', ''), 16)
+                        };
+                    }
 
                     // Update chain colors UI if switching to chain mode
                     if (mode === 'chain-id') {
@@ -1749,9 +2357,16 @@
                     e.stopPropagation();
                     const palette = option.dataset.palette;
 
-                    // Update active state
+                    // Update active state - remove from all main options and palette options
+                    colorModeOptions.forEach(opt => opt.classList.remove('active'));
                     paletteOptions.forEach(opt => opt.classList.remove('active'));
                     option.classList.add('active');
+
+                    // Mark rainbow option as active
+                    const rainbowOption = document.querySelector('.color-mode-option[data-mode="rainbow"]');
+                    if (rainbowOption) {
+                        rainbowOption.classList.add('active');
+                    }
 
                     // Update label
                     document.getElementById('color-mode-label').textContent =
@@ -1782,12 +2397,40 @@
             // Custom color selection
             const colorOptions = document.querySelectorAll('.color-option');
             colorOptions.forEach(option => {
-                option.addEventListener('click', async () => {
+                option.addEventListener('click', async (e) => {
+                    // Skip if clicking on the custom color picker input itself
+                    if (e.target.id === 'custom-color-picker') {
+                        return;
+                    }
+
                     const color = option.dataset.color;
 
                     // Update active state
                     colorOptions.forEach(opt => opt.classList.remove('active'));
                     option.classList.add('active');
+
+                    // Apply custom color
+                    if (currentColorMode === 'uniform' && color) {
+                        currentColorParams = {
+                            value: parseInt(color.replace('#', ''), 16)
+                        };
+                        await applyColorTheme();
+                    }
+                });
+            });
+
+            // Custom color picker handler
+            const customColorPicker = document.getElementById('custom-color-picker');
+            if (customColorPicker) {
+                customColorPicker.addEventListener('input', async (e) => {
+                    const color = e.target.value;
+
+                    // Update active state to custom picker option
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    const customPickerOption = document.querySelector('.custom-color-picker-option');
+                    if (customPickerOption) {
+                        customPickerOption.classList.add('active');
+                    }
 
                     // Apply custom color
                     if (currentColorMode === 'uniform') {
@@ -1797,7 +2440,16 @@
                         await applyColorTheme();
                     }
                 });
-            });
+
+                // Also activate on click
+                customColorPicker.addEventListener('click', () => {
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    const customPickerOption = document.querySelector('.custom-color-picker-option');
+                    if (customPickerOption) {
+                        customPickerOption.classList.add('active');
+                    }
+                });
+            }
 
             // Secondary structure color pickers
             const helixPicker = document.getElementById('helix-color');
@@ -1829,7 +2481,11 @@
             // Illustrative toggle
             const illustrativeToggle = document.getElementById('illustrative-toggle');
             if (illustrativeToggle) {
+                // Set initial state
+                illustrativeToggle.checked = illustrativeEnabled;
+
                 illustrativeToggle.addEventListener('change', async (e) => {
+                    illustrativeEnabled = e.target.checked;
                     await applyIllustrativeStyle(e.target.checked);
                 });
             }
@@ -1907,6 +2563,23 @@
                 });
             }
 
+            // Spin toggle
+            const spinToggle = document.getElementById('spin-toggle');
+            const spinToggleItem = document.getElementById('spin-toggle-item');
+            if (spinToggle) {
+                // Set initial state
+                spinToggle.checked = spinEnabled;
+
+                // Show spin toggle only if spin was enabled in Python
+                if (spinToggleItem && spinEnabled) {
+                    spinToggleItem.style.display = 'flex';
+                }
+
+                spinToggle.addEventListener('change', (e) => {
+                    spin(e.target.checked);
+                });
+            }
+
             // Surface opacity controls
             const opacitySlider = document.getElementById('surface-opacity-slider');
             const opacityInput = document.getElementById('surface-opacity-input');
@@ -1960,6 +2633,151 @@
                     }
                 });
             }
+
+            // Layout mode buttons
+            const singleViewBtn = document.getElementById('single-view-btn');
+            const gridViewBtn = document.getElementById('grid-view-btn');
+            if (singleViewBtn) {
+                singleViewBtn.addEventListener('click', () => setLayoutMode('single'));
+            }
+            if (gridViewBtn) {
+                gridViewBtn.addEventListener('click', () => setLayoutMode('grid'));
+            }
+
+            // Initialize UI to match Python-set values
+            initializeColorModeUI();
+            updateMultiStructureSectionsVisibility();
+
+            // pLDDT info toggle
+            const plddtInfoToggle = document.getElementById('plddt-info-toggle');
+            if (plddtInfoToggle) {
+                plddtInfoToggle.addEventListener('change', function() {
+                    const content = document.getElementById('plddt-info-content');
+                    if (this.checked) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // Initialize color mode UI to match current state
+        function initializeColorModeUI() {
+            const colorModeLabel = document.getElementById('color-mode-label');
+
+            // Clear all active states first
+            const allColorModeOptions = document.querySelectorAll('.color-mode-option');
+            const allPaletteOptions = document.querySelectorAll('.palette-option');
+            allColorModeOptions.forEach(opt => opt.classList.remove('active'));
+            allPaletteOptions.forEach(opt => opt.classList.remove('active'));
+
+            // Initialize color pickers from Python params if available
+            if (currentColorMode === 'secondary-structure' && currentColorParams.colors && currentColorParams.colors.params) {
+                const params = currentColorParams.colors.params;
+                const helixPicker = document.getElementById('helix-color');
+                const sheetPicker = document.getElementById('sheet-color');
+                const coilPicker = document.getElementById('coil-color');
+                
+                if (helixPicker && params.alphaHelix !== undefined) {
+                    helixPicker.value = molstarColorToHex(params.alphaHelix);
+                }
+                if (sheetPicker && params.betaStrand !== undefined) {
+                    sheetPicker.value = molstarColorToHex(params.betaStrand);
+                }
+                if (coilPicker && params.coil !== undefined) {
+                    coilPicker.value = molstarColorToHex(params.coil);
+                }
+            } else if (currentColorMode === 'uniform' && currentColorParams.value !== undefined) {
+                const customColorPicker = document.getElementById('custom-color-picker');
+                const colorHex = molstarColorToHex(currentColorParams.value).toUpperCase();
+                
+                if (customColorPicker) {
+                    customColorPicker.value = colorHex;
+                    
+                    // Deselect all color options first
+                    const allColorOptions = document.querySelectorAll('.color-option');
+                    allColorOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Check if the color matches a preset swatch
+                    let matchedPreset = false;
+                    allColorOptions.forEach(opt => {
+                        const presetColor = opt.dataset.color?.toUpperCase();
+                        if (presetColor && presetColor === colorHex) {
+                            opt.classList.add('active');
+                            matchedPreset = true;
+                        }
+                    });
+                    
+                    // If no preset matched, select the custom color picker option
+                    if (!matchedPreset) {
+                        const customColorOption = document.querySelector('.custom-color-picker-option');
+                        if (customColorOption) {
+                            customColorOption.classList.add('active');
+                        }
+                    }
+                }
+            } else if ((currentColorMode === 'chain-id' || currentColorMode === 'custom-chain-colors') && currentColorParams.colors) {
+                // Merge chain colors from Python params into global chainColors
+                Object.assign(chainColors, currentColorParams.colors);
+                // Update UI will happen when detectChains() is called after structure loads
+            }
+
+            // Handle rainbow mode specially
+            if (currentColorMode === 'rainbow-sequence') {
+                const palette = currentColorParams.palette || 'rainbow';
+                const paletteLabels = {
+                    'rainbow': 'Rainbow',
+                    'viridis': 'Viridis',
+                    'plasma': 'Plasma',
+                    'magma': 'Magma',
+                    'blue-red': 'Blue-Red',
+                    'pastel': 'Pastel'
+                };
+
+                // Update label
+                if (colorModeLabel) {
+                    colorModeLabel.textContent = `Rainbow (${paletteLabels[palette] || 'Rainbow'})`;
+                }
+
+                // Expand rainbow option
+                const rainbowOption = document.querySelector('.color-mode-option[data-mode="rainbow"]');
+                if (rainbowOption) {
+                    rainbowOption.classList.add('expanded', 'active');
+                }
+
+                // Activate palette option
+                const paletteOption = document.querySelector(`.palette-option[data-palette="${palette}"]`);
+                if (paletteOption) {
+                    paletteOption.classList.add('active');
+                }
+
+                updateColorSections('rainbow');
+            } else {
+                // Regular color modes
+                const colorModeLabels = {
+                    'default': 'Element',
+                    'uniform': 'Custom',
+                    'secondary-structure': 'Secondary',
+                    'chain-id': 'Chain',
+                    'custom-chain-colors': 'Chain',
+                    'plddt-confidence': 'pLDDT'
+                };
+
+                // Update label
+                if (colorModeLabel) {
+                    colorModeLabel.textContent = colorModeLabels[currentColorMode] || 'Element';
+                }
+
+                // Activate option - map custom-chain-colors to chain-id for UI
+                const uiMode = currentColorMode === 'custom-chain-colors' ? 'chain-id' : currentColorMode;
+                const option = document.querySelector(`.color-mode-option[data-mode="${uiMode}"]`);
+                if (option) {
+                    option.classList.add('active');
+                }
+
+                updateColorSections(uiMode);
+            }
         }
 
         // Update color sections visibility
@@ -1967,11 +2785,13 @@
             const customColors = document.getElementById('custom-colors');
             const secondaryColors = document.getElementById('secondary-colors');
             const chainColors = document.getElementById('chain-colors');
+            const plddtInfo = document.getElementById('plddt-legend');
 
             // Hide all sections first
             if (customColors) customColors.classList.remove('visible');
             if (secondaryColors) secondaryColors.classList.remove('active');
             if (chainColors) chainColors.classList.remove('active');
+            if (plddtInfo) plddtInfo.classList.remove('active');
 
             // Show relevant section
             if (mode === 'uniform') {
@@ -1980,7 +2800,10 @@
                 if (secondaryColors) secondaryColors.classList.add('active');
             } else if (mode === 'chain-id') {
                 if (chainColors) chainColors.classList.add('active');
+            } else if (mode === 'plddt-confidence' && hasPLDDT) {
+                if (plddtInfo) plddtInfo.classList.add('active');
             }
+            // Note: pLDDT info section visibility is controlled by color mode, only shown when pLDDT mode is active
         }
 
         // Remove surface
@@ -2013,6 +2836,439 @@
             }
         }
 
+        // Multi-structure management functions
+        function addModel(name, data, format) {
+            loadedModels.push({name, data, format});
+            updateFileList();
+        }
+
+        function updateFileList() {
+            const fileListEl = document.getElementById('file-list');
+            fileListEl.innerHTML = '';
+
+            if (loadedModels.length === 0) {
+                fileListEl.innerHTML = '<div style="color: #999; font-size: 11px; text-align: center; padding: 10px;">No files loaded</div>';
+                updateMultiStructureSectionsVisibility();
+                return;
+            }
+
+            loadedModels.forEach((model, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                if (index === currentModelIndex) {
+                    fileItem.classList.add('active');
+                }
+
+                const fileName = document.createElement('span');
+                fileName.className = 'file-item-name';
+                fileName.textContent = model.name;
+                fileName.title = model.name;
+                fileItem.appendChild(fileName);
+
+                // Add download icon
+                const downloadIcon = document.createElement('div');
+                downloadIcon.className = 'file-download-icon';
+                downloadIcon.title = 'Download file';
+                downloadIcon.innerHTML = `
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 15.5l-3.5-3.5h2.5v-6h2v6h2.5l-3.5 3.5zm7.5 3.5h-15v-2h15v2z"/>
+                    </svg>
+                `;
+                downloadIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadModel(index);
+                });
+                fileItem.appendChild(downloadIcon);
+
+                const deleteIcon = document.createElement('div');
+                deleteIcon.className = 'file-delete-icon';
+                deleteIcon.title = 'Delete file';
+                deleteIcon.innerHTML = `
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                `;
+                deleteIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteModel(index);
+                });
+                fileItem.appendChild(deleteIcon);
+
+                fileItem.addEventListener('click', async () => {
+                    if (currentLayoutMode === 'single' && index !== currentModelIndex) {
+                        await loadModelAtIndex(index);
+                    }
+                });
+
+                fileListEl.appendChild(fileItem);
+            });
+
+            updateMultiStructureSectionsVisibility();
+        }
+
+        function updateMultiStructureSectionsVisibility() {
+            const layoutSection = document.getElementById('layout-section');
+            const filesSection = document.getElementById('files-section');
+
+            // Show layout and files sections only when there are multiple structures
+            const shouldShow = loadedModels.length > 1;
+
+            if (layoutSection) {
+                layoutSection.style.display = shouldShow ? 'block' : 'none';
+            }
+            if (filesSection) {
+                filesSection.style.display = shouldShow ? 'block' : 'none';
+            }
+        }
+
+        async function loadModelAtIndex(index) {
+            if (index < 0 || index >= loadedModels.length) return;
+
+            currentModelIndex = index;
+            const model = loadedModels[index];
+
+            if (currentLayoutMode === 'single') {
+                await loadStructure(model.data, model.format);
+            }
+
+            updateFileList();
+        }
+
+        function downloadModel(index) {
+            if (index < 0 || index >= loadedModels.length) return;
+            
+            const model = loadedModels[index];
+            const extension = model.format === 'mmcif' || model.format === 'cif' ? 'cif' : 'pdb';
+            const filename = model.name.includes('.') ? model.name : `${model.name}.${extension}`;
+            
+            try {
+                const blob = new Blob([model.data], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                console.log(`Downloaded ${filename}`);
+            } catch (error) {
+                console.error('Error downloading file:', error);
+                alert('Error downloading file: ' + error.message);
+            }
+        }
+
+        function deleteModel(index) {
+            if (index < 0 || index >= loadedModels.length) return;
+
+            loadedModels.splice(index, 1);
+
+            // Adjust currentModelIndex
+            if (currentModelIndex >= loadedModels.length) {
+                currentModelIndex = loadedModels.length - 1;
+            }
+
+            // Reload if we deleted the current model and have other models
+            if (currentLayoutMode === 'single' && loadedModels.length > 0 && currentModelIndex >= 0) {
+                loadModelAtIndex(currentModelIndex);
+            } else if (loadedModels.length === 0) {
+                currentModelIndex = -1;
+                if (viewer && viewer.plugin) {
+                    viewer.plugin.clear();
+                }
+            }
+
+            updateFileList();
+
+            // Update grid view if in grid mode
+            if (currentLayoutMode === 'grid') {
+                recreateGridView();
+            }
+        }
+
+        // Layout mode switching
+        async function setLayoutMode(mode) {
+            if (currentLayoutMode === mode) return;
+
+            const previousLayoutMode = currentLayoutMode;
+            currentLayoutMode = mode;
+
+            // Update button states
+            const singleBtn = document.getElementById('single-view-btn');
+            const gridBtn = document.getElementById('grid-view-btn');
+
+            if (mode === 'single') {
+                singleBtn.classList.add('active');
+                gridBtn.classList.remove('active');
+                await switchToSingleView(previousLayoutMode);
+            } else {
+                singleBtn.classList.remove('active');
+                gridBtn.classList.add('active');
+                await switchToGridView();
+            }
+        }
+
+        async function switchToSingleView(previousMode) {
+            // Hide grid, show single viewer
+            const gridContainer = document.getElementById('grid-container');
+            const appContainer = document.getElementById('app-container');
+
+            gridContainer.style.display = 'none';
+            appContainer.style.display = 'flex';
+
+            // Show control panel when switching from grid to single view
+            if (previousMode === 'grid' || isGridMode) {
+                const panel = document.getElementById('control-panel');
+                if (panel) {
+                    panel.classList.add('visible');
+                    // Always ensure panel controls are set up when coming from grid
+                    setupPanelControls();
+                    
+                    // Expand body width to accommodate panel (280px panel width)
+                    const panelWidth = 280;
+                    const currentWidth = document.body.offsetWidth;
+                    const newWidth = viewerWidth + panelWidth;
+                    if (currentWidth < newWidth) {
+                        document.body.style.width = newWidth + 'px';
+                    }
+                }
+            }
+
+            // Load current model if we have one
+            if (loadedModels.length > 0 && currentModelIndex === -1) {
+                currentModelIndex = 0;
+            }
+
+            if (currentModelIndex >= 0 && currentModelIndex < loadedModels.length) {
+                await loadModelAtIndex(currentModelIndex);
+            }
+        }
+
+        async function switchToGridView() {
+            // Hide single viewer, show grid
+            const gridContainer = document.getElementById('grid-container');
+            const appContainer = document.getElementById('app-container');
+
+            gridContainer.style.display = 'grid';
+            appContainer.style.display = 'none';
+
+            // Restore original width when going back to grid (if we came from grid mode)
+            if (isGridMode) {
+                // Calculate grid width based on rows and cols
+                const gridWidth = viewerWidth;
+                document.body.style.width = gridWidth + 'px';
+            }
+
+            // Recreate grid with all loaded models
+            await recreateGridView();
+        }
+
+        async function recreateGridView() {
+            const gridContainer = document.getElementById('grid-container');
+            gridContainer.innerHTML = '';
+
+            if (loadedModels.length === 0) {
+                gridContainer.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999; font-size: 14px;">No structures loaded</div>';
+                return;
+            }
+
+            // Clear existing grid viewers
+            gridViewers.length = 0;
+
+            // Extend preview images array if needed
+            while (gridPreviewImages.length < loadedModels.length) {
+                gridPreviewImages.push(null);
+            }
+
+            // Calculate grid dimensions based on aspect ratio
+            const aspectRatio = viewerWidth / viewerHeight;
+            const numModels = loadedModels.length;
+            const base = Math.sqrt(numModels);
+
+            let rows, cols;
+            if (viewerWidth >= viewerHeight) {
+                cols = Math.ceil(base * Math.sqrt(aspectRatio));
+                rows = Math.ceil(numModels / cols);
+            } else {
+                rows = Math.ceil(base * Math.sqrt(1 / aspectRatio));
+                cols = Math.ceil(numModels / rows);
+            }
+
+            gridContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+            gridContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            const usePreviewMode = loadedModels.length > PREVIEW_MODE_THRESHOLD;
+
+            for (let i = 0; i < loadedModels.length; i++) {
+                const model = loadedModels[i];
+
+                const cellDiv = document.createElement('div');
+                cellDiv.className = activeGridViewers.has(i) ? 'grid-cell active' :
+                                   gridPreviewImages[i] ? 'grid-cell' : 'grid-cell loading';
+                cellDiv.setAttribute('data-grid-index', i);
+
+                const label = document.createElement('div');
+                label.className = 'grid-cell-label';
+                label.textContent = model.name;
+                cellDiv.appendChild(label);
+
+                const viewerId = `grid-viewer-${i}`;
+                const viewerDiv = document.createElement('div');
+                viewerDiv.id = viewerId;
+                viewerDiv.className = 'grid-cell-viewer';
+                cellDiv.appendChild(viewerDiv);
+
+                gridContainer.appendChild(cellDiv);
+
+                if (usePreviewMode) {
+                    // Preview mode: show preview image, activate on click
+                    if (activeGridViewers.has(i)) {
+                        // Already active, recreate the viewer
+                        await activateGridViewer(i, cellDiv, viewerDiv, model);
+                    } else if (gridPreviewImages[i]) {
+                        // Show cached preview
+                        viewerDiv.innerHTML = `<img src="${gridPreviewImages[i]}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                        viewerDiv.style.cursor = 'pointer';
+                    } else {
+                        // Generate preview asynchronously
+                        setTimeout(async () => {
+                            const previewUrl = await generatePreviewImage(i);
+                            if (previewUrl) {
+                                const cell = document.querySelector(`[data-grid-index="${i}"]`);
+                                if (cell && !activeGridViewers.has(i)) {
+                                    const viewer = cell.querySelector('.grid-cell-viewer');
+                                    if (viewer) {
+                                        viewer.innerHTML = `<img src="${previewUrl}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                                        viewer.style.cursor = 'pointer';
+                                        cell.classList.remove('loading');
+                                    }
+                                }
+                            }
+                        }, i * 500);
+                    }
+
+                    // Add click handler for activation
+                    cellDiv.addEventListener('click', (e) => handleGridCellClick(i, e));
+                } else {
+                    // Immediate mode: load all viewers directly
+                    await activateGridViewer(i, cellDiv, viewerDiv, model);
+                }
+            }
+        }
+
+        async function handleGridCellClick(index, event) {
+            // Check if clicking expand button
+            if (event.target.classList.contains('grid-expand-button')) {
+                return;
+            }
+
+            // If already active, just update LRU order
+            if (activeGridViewers.has(index)) {
+                addToViewerOrder(index);
+                return;
+            }
+
+            // Check WebGL limit and close oldest if needed
+            if (activeGridViewers.size >= MAX_ACTIVE_VIEWERS) {
+                console.log(`Reached viewer limit (${activeGridViewers.size}/${MAX_ACTIVE_VIEWERS}), closing oldest...`);
+                await closeOldestViewer();
+            }
+
+            // Activate the viewer
+            const cellDiv = document.querySelector(`[data-grid-index="${index}"]`);
+            const viewerDiv = cellDiv?.querySelector('.grid-cell-viewer');
+            const model = loadedModels[index];
+
+            if (cellDiv && viewerDiv && model) {
+                viewerDiv.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">Loading 3D viewer...</div>';
+                await activateGridViewer(index, cellDiv, viewerDiv, model);
+            }
+        }
+
+        async function activateGridViewer(index, cellDiv, viewerDiv, model) {
+            try {
+                const viewerId = `grid-viewer-${index}`;
+                viewerDiv.innerHTML = `<div id="${viewerId}" style="width: 100%; height: 100%;"></div>`;
+
+                const gridViewer = await molstar.Viewer.create(viewerId, {
+                    layoutIsExpanded: false,
+                    layoutShowControls: false,
+                    layoutShowLeftPanel: false,
+                    layoutShowSequence: false,
+                    layoutShowLog: false,
+                    viewportShowExpand: false,
+                    viewportShowSelectionMode: false,
+                    viewportShowAnimation: false
+                });
+
+                gridViewers[index] = gridViewer;
+                activeGridViewers.add(index);
+                addToViewerOrder(index);
+
+                // Set background color
+                const bgColor = parseInt('{{background_color}}'.replace('#', ''), 16);
+                gridViewer.plugin.canvas3d.setProps({
+                    renderer: { backgroundColor: bgColor }
+                });
+
+                // Load structure
+                await loadStructureForGrid(gridViewer, model.data, model.format);
+
+                // Apply settings
+                if (removeSolventEnabled) {
+                    await hideWaterForGrid(gridViewer);
+                }
+                await applyColorThemeForGrid(gridViewer);
+                if (surfaceEnabled) {
+                    await applySurfaceForGrid(gridViewer);
+                }
+                if (illustrativeEnabled) {
+                    await applyIllustrativeStyleForGrid(gridViewer);
+                }
+                if (spinEnabled) {
+                    setTimeout(() => {
+                        if (gridViewer && gridViewer.plugin && gridViewer.plugin.canvas3d) {
+                            try {
+                                const canvas = gridViewer.plugin.canvas3d;
+                                const trackball = canvas.props.trackball;
+                                canvas.setProps({
+                                    trackball: {
+                                        ...trackball,
+                                        animate: { name: 'spin', params: { speed: spinSpeed } }
+                                    }
+                                });
+                            } catch (e) {
+                                console.error('Error enabling spin for grid viewer:', e);
+                            }
+                        }
+                    }, 500);
+                }
+
+                // Add expand button
+                const expandButton = document.createElement('div');
+                expandButton.className = 'grid-expand-button';
+                expandButton.innerHTML = '⛶';
+                expandButton.title = 'Expand to single view';
+                expandButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentModelIndex = index;
+                    setLayoutMode('single');
+                });
+                cellDiv.appendChild(expandButton);
+
+                cellDiv.classList.add('active');
+                cellDiv.classList.remove('loading');
+
+                console.log(`Activated viewer ${index}. Active: ${activeGridViewers.size}/${MAX_ACTIVE_VIEWERS}`);
+            } catch (error) {
+                console.error(`Error activating grid viewer ${index}:`, error);
+                viewerDiv.className = 'grid-cell-empty';
+                viewerDiv.textContent = 'Error loading';
+                activeGridViewers.delete(index);
+                removeFromViewerOrder(index);
+            }
+        }
+
         // Grid mode functions
         async function initializeGridMode() {
             const gridContainer = document.getElementById('grid-container');
@@ -2030,17 +3286,47 @@
             const rows = {{rows}};
             const cols = {{cols}};
 
+            // Populate loadedModels from gridData and count total structures
+            let modelIndex = 0;
+            const gridIndexMap = new Map(); // Map grid positions to loadedModels indices
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const cellData = gridData[row][col];
+                    if (cellData !== null) {
+                        addModel(cellData.name || `Structure (${row},${col})`, cellData.data, cellData.format);
+                        gridIndexMap.set(`${row},${col}`, modelIndex);
+                        modelIndex++;
+                    }
+                }
+            }
+
+            // Extend preview images array
+            while (gridPreviewImages.length < loadedModels.length) {
+                gridPreviewImages.push(null);
+            }
+
+            const usePreviewMode = loadedModels.length > PREVIEW_MODE_THRESHOLD;
+
             try {
                 for (let row = 0; row < rows; row++) {
                     for (let col = 0; col < cols; col++) {
                         const cellData = gridData[row][col];
                         const cellDiv = document.createElement('div');
-                        cellDiv.className = 'grid-cell';
+                        const gridKey = `${row},${col}`;
+                        const modelIdx = gridIndexMap.get(gridKey);
+
+                        cellDiv.className = cellData === null ? 'grid-cell' :
+                                          activeGridViewers.has(modelIdx) ? 'grid-cell active' :
+                                          gridPreviewImages[modelIdx] ? 'grid-cell' : 'grid-cell loading';
+
+                        if (modelIdx !== undefined) {
+                            cellDiv.setAttribute('data-grid-index', modelIdx);
+                        }
 
                         // Add label
                         const label = document.createElement('div');
                         label.className = 'grid-cell-label';
-                        label.textContent = `(${row},${col})`;
+                        label.textContent = cellData ? (cellData.name || `(${row},${col})`) : `(${row},${col})`;
                         cellDiv.appendChild(label);
 
                         const viewerId = `viewer-${row}-${col}`;
@@ -2056,60 +3342,38 @@
                         cellDiv.appendChild(viewerDiv);
                         gridContainer.appendChild(cellDiv);
 
-                        // Create viewer if data exists
-                        if (cellData !== null) {
-                            try {
-                                const gridViewer = await molstar.Viewer.create(viewerId, {
-                                    layoutIsExpanded: false,
-                                    layoutShowControls: false,
-                                    layoutShowLeftPanel: false,
-                                    layoutShowSequence: false,
-                                    layoutShowLog: false,
-                                    viewportShowExpand: false,
-                                    viewportShowSelectionMode: false,
-                                    viewportShowAnimation: false
-                                });
+                        // Handle cell with data
+                        if (cellData !== null && modelIdx !== undefined) {
+                            const model = loadedModels[modelIdx];
 
-                                gridViewers.push({row, col, viewer: gridViewer});
-
-                                // Set background color
-                                const bgColor = parseInt('{{background_color}}'.replace('#', ''), 16);
-                                gridViewer.plugin.canvas3d.setProps({
-                                    renderer: {
-                                        backgroundColor: bgColor
-                                    }
-                                });
-
-                                // Load structure
-                                await loadStructureForGrid(gridViewer, cellData.data, cellData.format);
-
-                                // Hide water if removeSolvent is enabled
-                                if (removeSolventEnabled) {
-                                    await hideWaterForGrid(gridViewer);
+                            if (usePreviewMode) {
+                                // Preview mode
+                                if (gridPreviewImages[modelIdx]) {
+                                    viewerDiv.innerHTML = `<img src="${gridPreviewImages[modelIdx]}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                                    viewerDiv.style.cursor = 'pointer';
+                                } else {
+                                    // Generate preview asynchronously
+                                    setTimeout(async () => {
+                                        const previewUrl = await generatePreviewImage(modelIdx);
+                                        if (previewUrl && !activeGridViewers.has(modelIdx)) {
+                                            const cell = document.querySelector(`[data-grid-index="${modelIdx}"]`);
+                                            if (cell) {
+                                                const viewer = cell.querySelector('.grid-cell-viewer');
+                                                if (viewer) {
+                                                    viewer.innerHTML = `<img src="${previewUrl}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                                                    viewer.style.cursor = 'pointer';
+                                                    cell.classList.remove('loading');
+                                                }
+                                            }
+                                        }
+                                    }, modelIdx * 500);
                                 }
 
-                                // Apply color theme
-                                await applyColorThemeForGrid(gridViewer);
-
-                                // Apply surface if enabled
-                                if (surfaceEnabled) {
-                                    await applySurfaceForGrid(gridViewer);
-                                }
-
-                                // Apply illustrative style if enabled
-                                if (illustrativeEnabled) {
-                                    await applyIllustrativeStyle(gridViewer);
-                                }
-
-                                // Enable spinning if requested
-                                if (spinEnabled) {
-                                    gridViewer.plugin.managers.camera.spin(true);
-                                }
-
-                            } catch (error) {
-                                console.error(`Error creating viewer at (${row}, ${col}):`, error);
-                                viewerDiv.className = 'grid-cell-empty';
-                                viewerDiv.textContent = 'Error loading';
+                                // Add click handler
+                                cellDiv.addEventListener('click', (e) => handleGridCellClick(modelIdx, e));
+                            } else {
+                                // Immediate mode - load viewer directly
+                                await activateGridViewer(modelIdx, cellDiv, viewerDiv, model);
                             }
                         }
                     }
@@ -2147,53 +3411,302 @@
         }
 
         async function applyColorThemeForGrid(gridViewer) {
-            const structures = gridViewer.plugin.managers.structure.hierarchy.current.structures;
+            if (!gridViewer) return;
 
-            for (const structure of structures) {
-                for (const component of structure.components) {
-                    if (component.representations) {
-                        for (const repr of component.representations) {
-                            const update = gridViewer.plugin.build().to(repr.cell).update({
-                                ...repr.cell.transform.params,
-                                colorTheme: {
-                                    name: currentColorMode,
-                                    params: currentColorParams
-                                }
-                            });
-                            await update.commit();
+            try {
+                // Handle rainbow coloring specially
+                if (currentColorMode === 'rainbow-sequence') {
+                    await applyRainbowColoringForGrid(gridViewer);
+                    return;
+                }
+
+                // Handle custom chain colors specially
+                if (currentColorMode === 'custom-chain-colors' || currentColorMode === 'chain-id') {
+                    await applyCustomChainColorsForGrid(gridViewer);
+                    return;
+                }
+
+                // Handle pLDDT confidence coloring specially
+                if (currentColorMode === 'plddt-confidence') {
+                    await applyPLDDTColoringForGrid(gridViewer);
+                    return;
+                }
+
+                // Get current color params (may be updated by secondary structure)
+                let colorParams = currentColorParams;
+
+                // Handle secondary structure with custom colors
+                if (currentColorMode === 'secondary-structure') {
+                    const helixColor = document.getElementById('helix-color')?.value || '#0FA3FF';
+                    const sheetColor = document.getElementById('sheet-color')?.value || '#24B235';
+                    const coilColor = document.getElementById('coil-color')?.value || '#E8E8E8';
+
+                    colorParams = {
+                        colors: {
+                            name: 'custom',
+                            params: {
+                                alphaHelix: hexToMolstarColor(helixColor),
+                                threeTenHelix: hexToMolstarColor(helixColor),
+                                piHelix: hexToMolstarColor(helixColor),
+                                betaStrand: hexToMolstarColor(sheetColor),
+                                betaTurn: hexToMolstarColor(sheetColor),
+                                coil: hexToMolstarColor(coilColor),
+                                bend: hexToMolstarColor(coilColor)
+                            }
+                        }
+                    };
+                }
+
+                // Standard color theme application
+                const structures = gridViewer.plugin.managers.structure.hierarchy.current.structures;
+
+                for (const structure of structures) {
+                    for (const component of structure.components) {
+                        if (component.representations) {
+                            for (const repr of component.representations) {
+                                const update = gridViewer.plugin.build().to(repr.cell).update({
+                                    ...repr.cell.transform.params,
+                                    colorTheme: {
+                                        name: currentColorMode,
+                                        params: colorParams
+                                    }
+                                });
+                                await update.commit();
+                            }
                         }
                     }
                 }
+            } catch (error) {
+                console.error('Error applying color theme to grid viewer:', error);
             }
         }
 
         async function applySurfaceForGrid(gridViewer) {
-            const structures = gridViewer.plugin.managers.structure.hierarchy.current.structures;
-            const alphaValue = surfaceOpacity / 100;
+            if (!gridViewer) return;
 
-            for (const structure of structures) {
-                if (structure.components && structure.components.length > 0) {
-                    for (const component of structure.components) {
-                        // Skip water component if water is disabled
-                        const componentLabel = component.cell.obj?.label || '';
-                        if (componentLabel.toLowerCase() === 'water' && removeSolventEnabled) {
-                            continue;
-                        }
+            try {
+                const structures = gridViewer.plugin.managers.structure.hierarchy.current.structures;
+                const alphaValue = surfaceOpacity / 100;
+                const plugin = gridViewer.plugin;
 
-                        await gridViewer.plugin.builders.structure.representation.addRepresentation(
-                            component.cell,
-                            {
-                                type: 'gaussian-surface',
-                                typeParams: {
-                                    quality: 'high',
-                                    alpha: alphaValue
+                // Check inherit toggle
+                const inheritToggle = document.getElementById('surface-inherit-toggle');
+                const colorPicker = document.getElementById('surface-color-picker');
+                const inheritColor = inheritToggle ? inheritToggle.checked : true;
+
+                // Determine color theme for surface
+                let colorThemeName = currentColorMode;
+                let colorThemeParams = currentColorParams;
+
+                // If not inheriting, use custom surface color
+                if (!inheritColor && colorPicker) {
+                    const customColor = colorPicker.value;
+                    const themeName = `custom-surface-color-${Math.random().toString(36).substring(7)}`;
+
+                    const CustomSurfaceColorThemeProvider = {
+                        name: themeName,
+                        label: "Custom Surface Color",
+                        category: "Custom",
+                        factory: (ctx, props) => {
+                            return {
+                                granularity: "uniform",
+                                color: () => hexToMolstarColor(customColor),
+                                props: props
+                            };
+                        },
+                        getParams: () => ({}),
+                        defaultValues: {},
+                        isApplicable: (ctx) => !!ctx.structure
+                    };
+
+                    plugin.representation.structure.themes.colorThemeRegistry.add(CustomSurfaceColorThemeProvider);
+                    colorThemeName = themeName;
+                    colorThemeParams = {};
+                }
+                // Handle chain mode with custom colors for surface
+                else if ((currentColorMode === 'chain-id' || currentColorMode === 'custom-chain-colors') && Object.keys(chainColors).length > 0) {
+                    if (currentColorParams.colors && Object.keys(currentColorParams.colors).length > 0) {
+                        Object.assign(chainColors, currentColorParams.colors);
+                    }
+
+                    const themeName = `custom-chain-colors-surface-${Math.random().toString(36).substring(7)}`;
+
+                    const CustomChainColorSurfaceThemeProvider = {
+                        name: themeName,
+                        label: "Custom Chain Colors (Surface)",
+                        category: "Custom",
+                        factory: (ctx, props) => {
+                            return {
+                                granularity: "group",
+                                color: (location) => {
+                                    try {
+                                        const unit = location.unit;
+                                        const chainId = unit.chainGroupId || unit.label_asym_id || 'A';
+                                        const hexColor = chainColors[chainId] || '#4ECDC4';
+                                        return hexToMolstarColor(hexColor);
+                                    } catch (error) {
+                                        return 0x4ECDC4;
+                                    }
                                 },
-                                color: currentColorMode,
-                                colorParams: currentColorParams
+                                props: props
+                            };
+                        },
+                        getParams: () => ({}),
+                        defaultValues: {},
+                        isApplicable: (ctx) => !!ctx.structure
+                    };
+
+                    plugin.representation.structure.themes.colorThemeRegistry.add(CustomChainColorSurfaceThemeProvider);
+                    colorThemeName = themeName;
+                    colorThemeParams = {};
+                }
+                // Handle rainbow coloring for surface
+                else if (currentColorMode === 'rainbow-sequence') {
+                    const paletteColors = currentColorParams.colors || ['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF8000', '#FF0000'];
+                    const themeName = `rainbow-surface-${Math.random().toString(36).substring(7)}`;
+
+                    const RainbowSurfaceThemeProvider = {
+                        name: themeName,
+                        label: "Rainbow (Surface)",
+                        category: "Custom",
+                        factory: (ctx, props) => {
+                            const structure = ctx.structure;
+                            if (!structure || !structure.models || structure.models.length === 0) {
+                                return {
+                                    granularity: 'group',
+                                    color: () => 0x808080,
+                                    props: props
+                                };
                             }
-                        );
+
+                            let minSeqId = Infinity;
+                            let maxSeqId = -Infinity;
+
+                            for (const unit of structure.units) {
+                                if (unit.model && unit.model.atomicHierarchy) {
+                                    const residues = unit.model.atomicHierarchy.residues;
+                                    const seqIds = residues.label_seq_id;
+                                    for (let i = 0; i < seqIds.rowCount; i++) {
+                                        const seqId = seqIds.value(i);
+                                        if (seqId !== null && seqId !== undefined) {
+                                            minSeqId = Math.min(minSeqId, seqId);
+                                            maxSeqId = Math.max(maxSeqId, seqId);
+                                        }
+                                    }
+                                }
+                            }
+
+                            const totalResidues = maxSeqId - minSeqId + 1;
+                            const gradient = generateGradient(paletteColors, totalResidues);
+
+                            return {
+                                granularity: 'group',
+                                color: (location) => {
+                                    try {
+                                        const unit = location.unit;
+                                        const element = location.element;
+                                        const residueIndex = unit.model.atomicHierarchy.residueAtomSegments.index[element];
+                                        const seqId = unit.model.atomicHierarchy.residues.label_seq_id.value(residueIndex);
+                                        const colorIndex = Math.max(0, Math.min(totalResidues - 1, seqId - minSeqId));
+                                        const hexColor = gradient[colorIndex];
+                                        return hexToMolstarColor(hexColor);
+                                    } catch (error) {
+                                        return 0x808080;
+                                    }
+                                },
+                                props: props
+                            };
+                        },
+                        getParams: () => ({}),
+                        defaultValues: {},
+                        isApplicable: (ctx) => !!ctx.structure
+                    };
+
+                    plugin.representation.structure.themes.colorThemeRegistry.add(RainbowSurfaceThemeProvider);
+                    colorThemeName = themeName;
+                    colorThemeParams = {};
+                }
+                // Handle pLDDT mode for surface
+                else if (currentColorMode === 'plddt-confidence') {
+                    const themeName = `plddt-surface-${Math.random().toString(36).substring(7)}`;
+
+                    const PLDDTSurfaceThemeProvider = {
+                        name: themeName,
+                        label: "pLDDT Confidence (Surface)",
+                        category: "Validation",
+                        factory: (ctx, props) => {
+                            return {
+                                granularity: "group",
+                                color: (location) => {
+                                    if (location.element !== undefined) {
+                                        const model = ctx.structure.models[0];
+                                        if (model && model.atomicConformation && model.atomicConformation.B_iso_or_equiv) {
+                                            let bFactor = model.atomicConformation.B_iso_or_equiv.value(location.element);
+                                            
+                                            // Normalize to 0-1 range if stored as 0-100
+                                            if (bFactor > 1) {
+                                                bFactor = bFactor / 100;
+                                            }
+                                            
+                                            // Apply offset
+                                            // bFactor = bFactor - 0.04;
+                                            
+                                            if (bFactor > 0.9) {
+                                                return 0x0053D6; // Dark blue - very high confidence
+                                            } else if (bFactor > 0.7) {
+                                                return 0x65CBF3; // Light blue - confident
+                                            } else if (bFactor > 0.5) {
+                                                return 0xFFDB13; // Yellow - low confidence
+                                            } else {
+                                                return 0xFF7D45; // Orange - very low confidence
+                                            }
+                                        }
+                                    }
+                                    return 0x777777; // Default gray
+                                },
+                                props: props
+                            };
+                        },
+                        getParams: () => ({}),
+                        defaultValues: {},
+                        isApplicable: (ctx) => {
+                            const model = ctx.structure.models[0];
+                            return !!(model && model.atomicConformation && model.atomicConformation.B_iso_or_equiv);
+                        }
+                    };
+
+                    plugin.representation.structure.themes.colorThemeRegistry.add(PLDDTSurfaceThemeProvider);
+                    colorThemeName = themeName;
+                    colorThemeParams = {};
+                }
+
+                // Apply surface to all components
+                for (const structure of structures) {
+                    if (structure.components && structure.components.length > 0) {
+                        for (const component of structure.components) {
+                            // Skip water component if water is disabled
+                            const componentLabel = component.cell.obj?.label || '';
+                            if (componentLabel.toLowerCase() === 'water' && removeSolventEnabled) {
+                                continue;
+                            }
+
+                            await plugin.builders.structure.representation.addRepresentation(
+                                component.cell,
+                                {
+                                    type: 'gaussian-surface',
+                                    typeParams: {
+                                        quality: 'high',
+                                        alpha: alphaValue
+                                    },
+                                    color: colorThemeName,
+                                    colorParams: colorThemeParams
+                                }
+                            );
+                        }
                     }
                 }
+            } catch (error) {
+                console.error('Error applying surface to grid viewer:', error);
             }
         }
 
@@ -2224,6 +3737,437 @@
             }
         }
 
+        async function applyIllustrativeStyleForGrid(gridViewer) {
+            if (!gridViewer || !illustrativeEnabled) return;
+
+            try {
+                const plugin = gridViewer.plugin;
+
+                await plugin.managers.structure.component.setOptions({
+                    ...plugin.managers.structure.component.state.options,
+                    ignoreLight: true
+                });
+
+                if (plugin.canvas3d) {
+                    const pp = plugin.canvas3d.props.postprocessing;
+                    plugin.canvas3d.setProps({
+                        postprocessing: {
+                            outline: {
+                                name: 'on',
+                                params: {
+                                    scale: 1,
+                                    threshold: 0.33,
+                                    includeTransparent: true
+                                }
+                            },
+                            occlusion: {
+                                name: 'on',
+                                params: {
+                                    multiScale: { name: 'off', params: {} },
+                                    radius: 5,
+                                    bias: 0.8,
+                                    blurKernelSize: 15,
+                                    samples: 32,
+                                    resolutionScale: 1
+                                }
+                            },
+                            shadow: { name: 'off', params: {} }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error applying illustrative style to grid viewer:', error);
+            }
+        }
+
+        async function applyRainbowColoringForGrid(gridViewer) {
+            if (!gridViewer || !gridViewer.plugin) return;
+
+            try {
+                const plugin = gridViewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                if (!structures || structures.length === 0) return;
+
+                const paletteColors = currentColorParams.colors || ['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF8000', '#FF0000'];
+                const paletteName = currentColorParams.palette || 'rainbow';
+
+                const themeName = `rainbow-sequence-${paletteName}-${Math.random().toString(36).substring(7)}`;
+
+                const RainbowSequenceColorThemeProvider = {
+                    name: themeName,
+                    label: `Rainbow (${paletteName})`,
+                    category: "Custom",
+                    factory: (ctx, props) => {
+                        const structure = ctx.structure;
+                        if (!structure || !structure.models || structure.models.length === 0) {
+                            return {
+                                factory: RainbowSequenceColorThemeProvider.factory,
+                                granularity: 'group',
+                                color: () => 0x808080,
+                                props: props
+                            };
+                        }
+
+                        let minSeqId = Infinity;
+                        let maxSeqId = -Infinity;
+
+                        for (const unit of structure.units) {
+                            if (unit.model && unit.model.atomicHierarchy) {
+                                const residues = unit.model.atomicHierarchy.residues;
+                                const seqIds = residues.label_seq_id;
+
+                                for (let i = 0; i < seqIds.rowCount; i++) {
+                                    const seqId = seqIds.value(i);
+                                    if (seqId < minSeqId) minSeqId = seqId;
+                                    if (seqId > maxSeqId) maxSeqId = seqId;
+                                }
+                            }
+                        }
+
+                        return {
+                            factory: RainbowSequenceColorThemeProvider.factory,
+                            granularity: 'group',
+                            color: (location) => {
+                                try {
+                                    const unit = location.unit;
+                                    if (!unit.model || !unit.model.atomicHierarchy) {
+                                        return 0x808080;
+                                    }
+
+                                    const residues = unit.model.atomicHierarchy.residues;
+                                    const seqId = residues.label_seq_id.value(location.element);
+
+                                    const normalizedPos = (seqId - minSeqId) / (maxSeqId - minSeqId);
+                                    const colorIndex = Math.floor(normalizedPos * (paletteColors.length - 1));
+                                    const nextColorIndex = Math.min(colorIndex + 1, paletteColors.length - 1);
+
+                                    const color1 = hexToMolstarColor(paletteColors[colorIndex]);
+                                    const color2 = hexToMolstarColor(paletteColors[nextColorIndex]);
+
+                                    const localPos = (normalizedPos * (paletteColors.length - 1)) - colorIndex;
+
+                                    const r1 = (color1 >> 16) & 0xFF;
+                                    const g1 = (color1 >> 8) & 0xFF;
+                                    const b1 = color1 & 0xFF;
+
+                                    const r2 = (color2 >> 16) & 0xFF;
+                                    const g2 = (color2 >> 8) & 0xFF;
+                                    const b2 = color2 & 0xFF;
+
+                                    const r = Math.round(r1 + (r2 - r1) * localPos);
+                                    const g = Math.round(g1 + (g2 - g1) * localPos);
+                                    const b = Math.round(b1 + (b2 - b1) * localPos);
+
+                                    return (r << 16) | (g << 8) | b;
+                                } catch (error) {
+                                    return 0x808080;
+                                }
+                            },
+                            props: props,
+                            description: `Rainbow sequence coloring (${paletteName})`
+                        };
+                    },
+                    getParams: () => ({}),
+                    defaultValues: {},
+                    isApplicable: (ctx) => !!ctx.structure
+                };
+
+                plugin.representation.structure.themes.colorThemeRegistry.add(RainbowSequenceColorThemeProvider);
+
+                for (const structure of structures) {
+                    for (const component of structure.components) {
+                        if (component.representations) {
+                            for (const repr of component.representations) {
+                                const update = plugin.build().to(repr.cell).update({
+                                    ...repr.cell.transform.params,
+                                    colorTheme: { name: themeName, params: {} }
+                                });
+                                await update.commit();
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error applying rainbow coloring to grid viewer:', error);
+            }
+        }
+
+        async function applyCustomChainColorsForGrid(gridViewer) {
+            if (!gridViewer || !gridViewer.plugin) return;
+
+            try {
+                const plugin = gridViewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                if (!structures || structures.length === 0) return;
+
+                if (currentColorParams.colors && Object.keys(currentColorParams.colors).length > 0) {
+                    Object.assign(chainColors, currentColorParams.colors);
+                }
+
+                const themeName = `custom-chain-colors-${Math.random().toString(36).substring(7)}`;
+
+                const CustomChainColorThemeProvider = {
+                    name: themeName,
+                    label: "Custom Chain Colors",
+                    category: "Custom",
+                    factory: (ctx, props) => {
+                        return {
+                            factory: CustomChainColorThemeProvider.factory,
+                            granularity: "group",
+                            color: (location) => {
+                                try {
+                                    const unit = location.unit;
+                                    const chainId = unit.chainGroupId || unit.label_asym_id || 'A';
+                                    const hexColor = chainColors[chainId] || '#4ECDC4';
+                                    return hexToMolstarColor(hexColor);
+                                } catch (error) {
+                                    return 0x4ECDC4;
+                                }
+                            },
+                            props: props,
+                            description: 'Custom colors for each chain'
+                        };
+                    },
+                    getParams: () => ({}),
+                    defaultValues: {},
+                    isApplicable: (ctx) => !!ctx.structure
+                };
+
+                plugin.representation.structure.themes.colorThemeRegistry.add(CustomChainColorThemeProvider);
+
+                for (const structure of structures) {
+                    for (const component of structure.components) {
+                        if (component.representations) {
+                            for (const repr of component.representations) {
+                                const update = plugin.build().to(repr.cell).update({
+                                    ...repr.cell.transform.params,
+                                    colorTheme: { name: themeName, params: {} }
+                                });
+                                await update.commit();
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error applying chain colors to grid viewer:', error);
+            }
+        }
+
+        async function applyPLDDTColoringForGrid(gridViewer) {
+            if (!gridViewer || !gridViewer.plugin) return;
+
+            try {
+                const plugin = gridViewer.plugin;
+                const structures = plugin.managers.structure.hierarchy.current.structures;
+
+                if (!structures || structures.length === 0) return;
+
+                // Check if structure has B-factor data
+                const structureData = structures[0].cell.obj?.data;
+                if (!structureData) return;
+
+                const model = structureData.models[0];
+                if (!model || !model.atomicConformation || !model.atomicConformation.B_iso_or_equiv) {
+                    console.warn('No B-factor data found for pLDDT coloring in grid viewer');
+                    return;
+                }
+
+                const themeName = `plddt-confidence-${Math.random().toString(36).substring(7)}`;
+
+                const PLDDTColorThemeProvider = {
+                    name: themeName,
+                    label: "pLDDT Confidence",
+                    category: "Validation",
+                    factory: (ctx, props) => {
+                        return {
+                            granularity: "group",
+                            color: (location) => {
+                                if (location.element !== undefined) {
+                                    const model = ctx.structure.models[0];
+                                    if (model && model.atomicConformation && model.atomicConformation.B_iso_or_equiv) {
+                                        let bFactor = model.atomicConformation.B_iso_or_equiv.value(location.element);
+                                        
+                                        // Normalize to 0-1 range if stored as 0-100
+                                        if (bFactor > 1) {
+                                            bFactor = bFactor / 100;
+                                        }
+                                        
+                                        // Apply offset
+                                        // bFactor = bFactor - 0.04;
+                                        
+                                        if (bFactor > 0.9) {
+                                            return 0x0053D6; // Dark blue - very high confidence
+                                        } else if (bFactor > 0.7) {
+                                            return 0x65CBF3; // Light blue - confident
+                                        } else if (bFactor > 0.5) {
+                                            return 0xFFDB13; // Yellow - low confidence
+                                        } else {
+                                            return 0xFF7D45; // Orange - very low confidence
+                                        }
+                                    }
+                                }
+                                return 0x777777; // Default gray
+                            },
+                            props: props,
+                            description: 'Color by pLDDT confidence score'
+                        };
+                    },
+                    getParams: () => ({}),
+                    defaultValues: {},
+                    isApplicable: (ctx) => {
+                        const model = ctx.structure.models[0];
+                        return !!(model && model.atomicConformation && model.atomicConformation.B_iso_or_equiv);
+                    }
+                };
+
+                plugin.representation.structure.themes.colorThemeRegistry.add(PLDDTColorThemeProvider);
+
+                for (const structure of structures) {
+                    for (const component of structure.components) {
+                        if (component.representations) {
+                            for (const repr of component.representations) {
+                                const update = plugin.build().to(repr.cell).update({
+                                    ...repr.cell.transform.params,
+                                    colorTheme: { name: themeName, params: {} }
+                                });
+                                await update.commit();
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error applying pLDDT coloring to grid viewer:', error);
+            }
+        }
+
+        // LRU Management Functions
+        function addToViewerOrder(index) {
+            const existingIndex = gridViewerOrder.indexOf(index);
+            if (existingIndex !== -1) {
+                gridViewerOrder.splice(existingIndex, 1);
+            }
+            gridViewerOrder.push(index);
+        }
+
+        function removeFromViewerOrder(index) {
+            const existingIndex = gridViewerOrder.indexOf(index);
+            if (existingIndex !== -1) {
+                gridViewerOrder.splice(existingIndex, 1);
+            }
+        }
+
+        async function closeOldestViewer() {
+            if (gridViewerOrder.length === 0) return null;
+
+            const oldestIndex = gridViewerOrder[0];
+            console.log(`Closing oldest viewer: ${oldestIndex}`);
+
+            try {
+                if (gridViewers[oldestIndex] && gridViewers[oldestIndex].plugin) {
+                    gridViewers[oldestIndex].plugin.dispose();
+                }
+                gridViewers[oldestIndex] = null;
+
+                activeGridViewers.delete(oldestIndex);
+                removeFromViewerOrder(oldestIndex);
+
+                // Revert to preview image
+                const cellDiv = document.querySelector(`[data-grid-index="${oldestIndex}"]`);
+                if (cellDiv && gridPreviewImages[oldestIndex]) {
+                    const viewerDiv = cellDiv.querySelector('.grid-cell-viewer');
+                    if (viewerDiv) {
+                        viewerDiv.innerHTML = `<img src="${gridPreviewImages[oldestIndex]}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                    }
+                    cellDiv.classList.remove('active');
+                }
+
+                console.log(`Closed viewer ${oldestIndex}`);
+                return oldestIndex;
+            } catch (error) {
+                console.error(`Error closing viewer ${oldestIndex}:`, error);
+                return null;
+            }
+        }
+
+        async function generatePreviewImage(modelIndex) {
+            try {
+                const model = loadedModels[modelIndex];
+                if (!model) return null;
+
+                // Create offscreen div
+                const offscreenDiv = document.createElement('div');
+                offscreenDiv.style.width = '400px';
+                offscreenDiv.style.height = '400px';
+                offscreenDiv.style.position = 'absolute';
+                offscreenDiv.style.left = '-9999px';
+                document.body.appendChild(offscreenDiv);
+
+                const offscreenViewer = await molstar.Viewer.create(offscreenDiv, {
+                    layoutIsExpanded: false,
+                    layoutShowControls: false,
+                    layoutShowLeftPanel: false,
+                    layoutShowSequence: false,
+                    layoutShowLog: false,
+                    viewportShowExpand: false,
+                    viewportShowSelectionMode: false,
+                    viewportShowAnimation: false
+                });
+
+                // Set background color
+                const bgColor = parseInt('{{background_color}}'.replace('#', ''), 16);
+                offscreenViewer.plugin.canvas3d.setProps({
+                    renderer: { backgroundColor: bgColor }
+                });
+
+                // Load structure
+                await loadStructureForGrid(offscreenViewer, model.data, model.format);
+
+                // Apply all settings to match grid view
+                if (removeSolventEnabled) {
+                    await hideWaterForGrid(offscreenViewer);
+                }
+
+                // Apply color theme
+                await applyColorThemeForGrid(offscreenViewer);
+
+                // Apply surface if enabled
+                if (surfaceEnabled) {
+                    await applySurfaceForGrid(offscreenViewer);
+                }
+
+                // Apply illustrative style if enabled
+                if (illustrativeEnabled) {
+                    await applyIllustrativeStyleForGrid(offscreenViewer);
+                }
+
+                // Wait for render
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Get canvas and convert to image
+                const canvas = offscreenDiv.querySelector('canvas');
+                if (canvas) {
+                    const imageUrl = canvas.toDataURL('image/png');
+                    gridPreviewImages[modelIndex] = imageUrl;
+
+                    // Cleanup
+                    offscreenViewer.plugin.dispose();
+                    document.body.removeChild(offscreenDiv);
+
+                    return imageUrl;
+                }
+
+                // Cleanup if failed
+                offscreenViewer.plugin.dispose();
+                document.body.removeChild(offscreenDiv);
+                return null;
+            } catch (error) {
+                console.error(`Error generating preview for model ${modelIndex}:`, error);
+                return null;
+            }
+        }
+
         // Expose functions for Python communication
         window.molview = {
             loadStructure,
@@ -2232,7 +4176,12 @@
             setBackgroundColor,
             spin,
             isGridMode,
-            gridViewers
+            gridViewers,
+            addModel,
+            loadedModels,
+            currentModelIndex,
+            setLayoutMode,
+            currentLayoutMode
         };
 
         // Initialize grid mode if enabled

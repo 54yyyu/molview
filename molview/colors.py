@@ -192,10 +192,20 @@ class PLDDTColorTheme(ColorTheme):
         super().__init__('plddt')
 
     def to_molstar_config(self):
+        # pLDDT values are in the range [0, 100]. We need to map this to the color scale.
+        # Molstar's bfactor color theme expects values in a specific domain,
+        # so we provide the domain [0, 100] to correctly map the colors.
         return {
             'name': 'plddt-confidence',
-            'params': {}
+            'params': {
+                'domain': [0, 100]  # Map pLDDT range to colors
+            }
         }
+        
+    @staticmethod
+    def _hex_to_int(hex_color):
+        """Convert hex color to integer for Molstar."""
+        return int(hex_color.replace('#', ''), 16)
 
 
 def get_color_theme(mode, **kwargs):
