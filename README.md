@@ -5,7 +5,7 @@
 An IPython/Jupyter widget for interactive molecular visualization, based on [Molstar](https://molstar.org/). This is the Jupyter widget version of [nano-protein-viewer](https://github.com/54yyyu/nano-protein-viewer).
 
 
-
+<br>
 
 
 ## Features
