@@ -1,6 +1,6 @@
 # MolView
 
-<img src="https://raw.githubusercontent.com/54yyyu/molview/media/logo.ico" width="40%" max-width="250" alt="Molview" align="right">
+<img src="https://raw.githubusercontent.com/54yyyu/molview/main/media/logo.ico" width="40%" max-width="250" alt="Molview" align="right">
 
 An IPython/Jupyter widget for interactive molecular visualization, based on [Molstar](https://molstar.org/). This is the Jupyter widget version of [nano-protein-viewer](https://github.com/54yyyu/nano-protein-viewer).
 
