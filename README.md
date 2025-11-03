@@ -362,7 +362,8 @@ MolView provides a py3dmol-like API for easy adoption. Key differences:
 
 ## Related Projects
 
-- [nano-protein-viewer](https://github.com/54yyyu/nano-protein-viewer) - Standalone web version
+- [nano-protein-viewer](https://github.com/54yyyu/nano-protein-viewer) - Standalone vscode/cursor plugin version
+- [protein-viewer](https://stevenyuyy.us/protein-viewer) - Standalone web app version
 - [Molstar](https://molstar.org/) - Underlying visualization engine
 
 ## License
@@ -383,9 +384,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Roadmap
 
 - [x] Multiple viewer grid support
+- [x] Export to image/video
+- [x] Surface customization options
 - [ ] Selection and highlighting
 - [ ] Animation playback
 - [ ] Label/annotation support
-- [x] Export to image/video
 - [ ] Additional representation styles (stick, sphere, line)
-- [x] Surface customization options
