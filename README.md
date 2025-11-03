@@ -10,6 +10,8 @@ An IPython/Jupyter widget for interactive molecular visualization, based on [Mol
 
 ## Features
 
+![img](media/demo.png)
+
 - **Molstar-powered visualization** - Advanced molecular graphics engine
 - **Multiple color modes** - Element, chain, secondary structure, rainbow gradients, pLDDT confidence, and custom colors
 - **Interactive controls** - Optional control panel with real-time adjustments
@@ -24,6 +26,12 @@ An IPython/Jupyter widget for interactive molecular visualization, based on [Mol
 
 ```bash
 pip install molview
+```
+
+Or using [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv pip install molview
 ```
 
 ## Quick Start
@@ -333,6 +341,14 @@ Format is auto-detected from file content.
 See the `example/` directory for Jupyter notebooks:
 - `example.ipynb` - Comprehensive feature demonstrations
 - `grid_examples.ipynb` - Grid layout examples
+
+### Online Notebooks (Google Colab)
+
+Try MolView directly in your browser without installation:
+
+- **[MolView Examples](https://colab.research.google.com/drive/18MeQnIWm2lXe4etoNmO6XnP05bc0yL5g#scrollTo=BDNR-wr0RZKz)** - Comprehensive feature demonstrations
+- **[ColabFold Integration](https://colab.research.google.com/drive/1tB7dWAA_ees2DOUNxi_5ooIsMTYqd9Ua#scrollTo=knxCI2CNtbNJ)** - Protein structure prediction with ColabFold
+- **[Boltz-2 Integration](https://colab.research.google.com/drive/1MtcB3qljOABl2iHsFiXaVZnOhmeqsElV#scrollTo=mqIcGvdC6AAW)** - Protein structure prediction with Boltz-2
 
 ## py3dmol Compatibility
 
