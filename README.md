@@ -1,5 +1,8 @@
 # MolView
 
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/molview?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/molview)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 <img src="https://raw.githubusercontent.com/54yyyu/molview/main/media/logo.ico" width="10%" alt="Molview" align="left">
 
 An IPython/Jupyter widget for interactive molecular visualization, based on [Molstar](https://molstar.org/). This is the Jupyter widget version of [nano-protein-viewer](https://github.com/54yyyu/nano-protein-viewer).
